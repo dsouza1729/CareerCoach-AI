@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Cover Letter - CareerCoach{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto py-10 px-4">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Cover Letter Generator</h1>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Generate a tailored cover letter from your resume and job posting.</p>
+    <div class="mt-8 space-y-4">
+        <div>
+            <label class="block text-sm font-medium">Resume text</label>
+            <textarea id="resume_text" rows="5" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 p-3 text-sm">{{ resume_text or '' }}</textarea>
+        </div>
+        <div>
+            <label class="block text-sm font-medium">Job description</label>
+            <textarea id="job_description" rows="6" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 p-3 text-sm"></textarea>
+        </div>
+        <div>
+            <label class="block text-sm font-medium">Tone</label>
+            <select id="tone" class="mt-1 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2">
+                <option value="professional">Professional</option>
+                <option value="enthusiastic">Enthusiastic</option>
+                <option value="concise">Concise</option>
+            </select>
+        </div>
+        <button id="generateBtn" class="py-3 px-6 bg-brand-600 text-white rounded-md font-medium hover:bg-brand-700">Generate</button>
+    </div>
+    <div id="output" class="hidden mt-8 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="font-semibold text-gray-900 dark:text-white">Your cover letter</h2>
+            <button id="copyBtn" class="text-sm text-brand-600 hover:underline">Copy</button>
+        </div>
+        <div id="letterText" class="prose dark:prose-invert text-sm whitespace-pre-wrap text-gray-700 dark:text-gray-300"></div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+let letterContent = '';
+document.getElementById('generateBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('generateBtn');
+    btn.disabled = true;
+    const res = await fetch('/cover-letter', {
+        method: 'POST',
+        headers: csrfHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({
+            resume_text: document.getElementById('resume_text').value,
+            job_description: document.getElementById('job_description').value,
+            tone: document.getElementById('tone').value
+        })
+    });
+    const data = await res.json();
+    btn.disabled = false;
+    if (!res.ok) { showToast(data.error || 'Generation failed', 'error'); return; }
+    letterContent = data.cover_letter || '';
+    document.getElementById('letterText').textContent = letterContent;
+    document.getElementById('output').classList.remove('hidden');
+    showToast('Cover letter generated', 'success');
+});
+document.getElementById('copyBtn').addEventListener('click', () => copyToClipboard(letterContent));
+</script>
+{% endblock %}

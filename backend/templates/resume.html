@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+
+{% block title %}Resume Analyzer - AI Career Coach{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    
+    <div class="md:flex md:items-center md:justify-between mb-8">
+        <div class="flex-1 min-w-0">
+            <h2 class="text-2xl font-bold leading-7 text-gray-900 dark:text-white sm:text-3xl sm:truncate">Resume Analyzer</h2>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Upload your PDF resume to get an AI-powered ATS score and feedback.</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Upload Section -->
+        <div class="lg:col-span-1">
+            <div class="bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow duration-300 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden relative">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-brand-500 to-blue-600"></div>
+                <div class="px-4 py-6 sm:p-6">
+                    <h3 class="text-lg leading-6 font-bold text-gray-900 dark:text-white flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                        Upload Resume
+                    </h3>
+                    <div class="mt-2 max-w-xl text-sm text-gray-500 dark:text-gray-400 mb-2">
+                        <p>PDF and DOCX formats supported (Max 10MB).</p>
+                    </div>
+                    <form class="mt-5" id="uploadForm">
+                        <div id="dropzoneContainer" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md transition-colors">
+                            <div class="space-y-1 text-center">
+                                <svg id="uploadIcon" class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" stroke="currentColor" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path id="uploadIconPath" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                </svg>
+                                <div class="flex text-sm text-gray-600 dark:text-gray-300 justify-center mt-4">
+                                    <label for="file-upload" class="relative cursor-pointer bg-white dark:bg-gray-800 rounded-md font-medium text-brand-600 hover:text-brand-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-brand-500 dark:focus-within:ring-offset-gray-800">
+                                        <span>Upload a file</span>
+                                        <input id="file-upload" name="file" type="file" class="sr-only" accept="application/pdf, .docx, application/vnd.openxmlformats-officedocument.wordprocessingml.document" required>
+                                    </label>
+                                </div>
+                                <div class="flex items-center justify-center space-x-2 mt-2">
+                                    <p class="text-xs text-gray-500 dark:text-gray-400" id="fileNameDisplay">PDF or DOCX up to 10MB</p>
+                                    <button type="button" id="removeFileBtn" class="hidden text-red-500 hover:text-red-700 focus:outline-none" title="Remove file">
+                                        <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="previewContainer" class="hidden mt-4 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-900 shadow-inner">
+                            <iframe id="pdfPreview" class="hidden w-full h-96 border-0" title="Resume Preview"></iframe>
+                            <div id="docxPreviewFallback" class="hidden w-full h-48 flex flex-col items-center justify-center text-center p-6">
+                                <svg class="h-12 w-12 text-blue-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                <h4 class="text-sm font-semibold text-gray-900 dark:text-white">Word Document Selected</h4>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Native preview is not available for DOCX files in the browser. Click 'Analyze Resume' to proceed.</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 px-6">
+                            <label for="target_job" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Target Job Title or Description (Optional)</label>
+                            <input type="text" name="target_job" id="target_job" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="e.g., Senior Backend Engineer">
+                        </div>
+
+                        <button type="submit" id="uploadBtn" class="mt-4 w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500">
+                            Analyze Resume
+                        </button>
+                    </form>
+                    
+                    <div id="loadingStatus" class="hidden mt-4 text-center">
+                        <div class="inline-flex items-center space-x-2 text-brand-600">
+                            <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            <span class="text-sm font-medium">Extracting and analyzing...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History/Results Section -->
+        <div class="lg:col-span-2">
+            <div class="bg-white dark:bg-gray-800 shadow sm:rounded-lg h-full border border-gray-100 dark:border-gray-700">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">Past Analyses</h3>
+                    
+                    <div class="space-y-4">
+                        {% if resumes|length == 0 %}
+                        <div class="text-center py-10 bg-gray-50 dark:bg-gray-900/50 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600">
+                            <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No resumes</h3>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by uploading your resume.</p>
+                        </div>
+                        {% else %}
+                            {% for resume in resumes %}
+                            <div class="bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg p-5" data-resume-card="{{ resume.id }}">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center">
+                                        <svg class="h-6 w-6 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path></svg>
+                                        <h4 class="text-md font-bold text-gray-900 dark:text-white">{{ resume.filename }}</h4>
+                                        {% if resume.target_job %}
+                                        <span class="ml-2 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 truncate max-w-xs" title="{{ resume.target_job }}">
+                                            Target: {{ resume.target_job }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">{{ resume.uploaded_at }}</span>
+                                        <button type="button" class="delete-resume-btn text-xs text-red-600 hover:text-red-700 dark:text-red-400" data-resume-id="{{ resume.id }}" title="Delete analysis">Delete</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                    <div class="bg-white dark:bg-gray-800 p-4 rounded border border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center">
+                                        <span class="text-sm text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wide mb-2">ATS Score</span>
+                                        <div class="score-ring" data-score="{{ resume.ats_score }}">
+                                            <svg viewBox="0 0 36 36" class="w-20 h-20">
+                                                <path class="text-gray-200 dark:text-gray-700" stroke="currentColor" stroke-width="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                                <path class="{% if resume.ats_score > 80 %}text-green-500{% elif resume.ats_score > 60 %}text-yellow-500{% else %}text-red-500{% endif %}" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="{{ resume.ats_score }}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                            </svg>
+                                            <span class="score-value text-2xl font-extrabold {% if resume.ats_score > 80 %}text-green-600{% elif resume.ats_score > 60 %}text-yellow-500{% else %}text-red-500{% endif %}">{{ resume.ats_score }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-span-2 bg-white dark:bg-gray-800 p-4 rounded border border-gray-200 dark:border-gray-700">
+                                        <span class="text-sm text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wide block mb-2">Improvements</span>
+                                        <p class="text-sm text-gray-800 dark:text-gray-200">{{ resume.improvements }}</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            
+                            {% if has_more %}
+                            <div class="pt-4 text-center">
+                                <a href="/resume/history" class="text-sm font-medium text-brand-600 hover:text-brand-500">View All History &rarr;</a>
+                            </div>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const fileInput = document.getElementById('file-upload');
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    const uploadForm = document.getElementById('uploadForm');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const loadingStatus = document.getElementById('loadingStatus');
+    const dropzoneContainer = document.getElementById('dropzoneContainer');
+    const uploadIcon = document.getElementById('uploadIcon');
+    const uploadIconPath = document.getElementById('uploadIconPath');
+    const removeFileBtn = document.getElementById('removeFileBtn');
+    
+    const previewContainer = document.getElementById('previewContainer');
+    const pdfPreview = document.getElementById('pdfPreview');
+    const docxPreviewFallback = document.getElementById('docxPreviewFallback');
+    let currentPreviewUrl = null;
+
+    const defaultIconPath = "M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12";
+    const documentIconPath = "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z";
+
+    function resetDropzone() {
+        fileNameDisplay.textContent = 'PDF or DOCX up to 10MB';
+        fileNameDisplay.classList.remove('text-brand-600', 'font-medium');
+        dropzoneContainer.classList.remove('border-brand-500', 'bg-brand-50', 'dark:bg-brand-900/20');
+        dropzoneContainer.classList.add('border-gray-300', 'dark:border-gray-600');
+        uploadIcon.classList.remove('text-brand-500');
+        uploadIcon.classList.add('text-gray-400', 'dark:text-gray-500');
+        uploadIconPath.setAttribute('d', defaultIconPath);
+        removeFileBtn.classList.add('hidden');
+        fileInput.value = '';
+        
+        previewContainer.classList.add('hidden');
+        pdfPreview.classList.add('hidden');
+        docxPreviewFallback.classList.add('hidden');
+        if (currentPreviewUrl) {
+            URL.revokeObjectURL(currentPreviewUrl);
+            currentPreviewUrl = null;
+            pdfPreview.src = '';
+        }
+    }
+
+    removeFileBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        resetDropzone();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        if(e.target.files.length > 0) {
+            const file = e.target.files[0];
+            if (file.size > 10 * 1024 * 1024) {
+                alert('File exceeds 10MB limit.');
+                e.target.value = '';
+                resetDropzone();
+                return;
+            }
+            fileNameDisplay.textContent = file.name;
+            fileNameDisplay.classList.add('text-brand-600', 'font-medium');
+            
+            // Visual feedback for successful selection
+            dropzoneContainer.classList.remove('border-gray-300', 'dark:border-gray-600');
+            dropzoneContainer.classList.add('border-brand-500', 'bg-brand-50', 'dark:bg-brand-900/20');
+            uploadIcon.classList.remove('text-gray-400', 'dark:text-gray-500');
+            uploadIcon.classList.add('text-brand-500');
+            uploadIconPath.setAttribute('d', documentIconPath);
+            removeFileBtn.classList.remove('hidden');
+            
+            if (currentPreviewUrl) {
+                URL.revokeObjectURL(currentPreviewUrl);
+                currentPreviewUrl = null;
+            }
+            
+            if (file.name.toLowerCase().endsWith('.pdf') || file.type === 'application/pdf') {
+                // Safely ensure the file is treated as application/pdf
+                const blob = file.slice(0, file.size, 'application/pdf');
+                currentPreviewUrl = URL.createObjectURL(blob);
+                pdfPreview.src = currentPreviewUrl;
+                pdfPreview.classList.remove('hidden');
+                docxPreviewFallback.classList.add('hidden');
+                previewContainer.classList.remove('hidden');
+            } else if (file.name.toLowerCase().endsWith('.docx')) {
+                pdfPreview.classList.add('hidden');
+                docxPreviewFallback.classList.remove('hidden');
+                previewContainer.classList.remove('hidden');
+            }
+        } else {
+            resetDropzone();
+        }
+    });
+
+    uploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        if (fileInput.files.length === 0) {
+            alert('Please select a file first.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+        formData.append('target_job', document.getElementById('target_job').value);
+        formData.append('csrf_token', getCsrfToken());
+
+        uploadBtn.disabled = true;
+        uploadBtn.classList.add('opacity-50');
+        loadingStatus.classList.remove('hidden');
+
+        try {
+            const response = await fetch('/resume', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (response.ok) {
+                // Reload to show the new result in the history list
+                window.location.reload();
+            } else {
+                const data = await response.json();
+                alert(data.error || 'Failed to analyze resume.');
+            }
+        } catch (error) {
+            alert('An error occurred during upload.');
+        } finally {
+            uploadBtn.disabled = false;
+            uploadBtn.classList.remove('opacity-50');
+            loadingStatus.classList.add('hidden');
+        }
+    });
+</script>
+{% endblock %}

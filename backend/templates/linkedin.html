@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}LinkedIn Summary - CareerCoach{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto py-10 px-4">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">LinkedIn Summary Generator</h1>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Create a compelling About section for your profile.</p>
+    <div class="mt-8 space-y-4">
+        <div>
+            <label class="block text-sm font-medium">Target role</label>
+            <input type="text" id="target_role" value="{{ profile.target_role or '' }}" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2">
+        </div>
+        <div>
+            <label class="block text-sm font-medium">Resume text</label>
+            <textarea id="resume_text" rows="8" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 p-3 text-sm">{{ resume_text or '' }}</textarea>
+        </div>
+        <button id="generateBtn" class="py-3 px-6 bg-brand-600 text-white rounded-md font-medium hover:bg-brand-700">Generate Summary</button>
+    </div>
+    <div id="output" class="hidden mt-8 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="font-semibold">LinkedIn About</h2>
+            <button id="copyBtn" class="text-sm text-brand-600 hover:underline">Copy</button>
+        </div>
+        <div id="summaryText" class="text-sm whitespace-pre-wrap text-gray-700 dark:text-gray-300"></div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+let summaryContent = '';
+document.getElementById('generateBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('generateBtn');
+    btn.disabled = true;
+    const res = await fetch('/linkedin', {
+        method: 'POST',
+        headers: csrfHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({
+            resume_text: document.getElementById('resume_text').value,
+            target_role: document.getElementById('target_role').value
+        })
+    });
+    const data = await res.json();
+    btn.disabled = false;
+    if (!res.ok) { showToast(data.error || 'Generation failed', 'error'); return; }
+    summaryContent = data.summary || '';
+    document.getElementById('summaryText').textContent = summaryContent;
+    document.getElementById('output').classList.remove('hidden');
+    showToast('Summary generated', 'success');
+});
+document.getElementById('copyBtn').addEventListener('click', () => copyToClipboard(summaryContent));
+</script>
+{% endblock %}

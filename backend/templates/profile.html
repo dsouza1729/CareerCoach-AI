@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Profile - CareerCoach{% endblock %}
+{% block content %}
+<div class="max-w-xl mx-auto py-12 px-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Your Profile</h1>
+        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Update your preferences for personalized AI coaching.</p>
+        <form id="profileForm" class="mt-8 space-y-5">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Full name</label>
+                <input type="text" id="full_name" value="{{ profile.full_name or '' }}" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Target role</label>
+                <input type="text" id="target_role" value="{{ profile.target_role or '' }}" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Industry</label>
+                <input type="text" id="industry" value="{{ profile.industry or '' }}" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Years of experience</label>
+                <input type="text" id="years_experience" value="{{ profile.years_experience or '' }}" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Coaching tone</label>
+                <select id="tone" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2">
+                    <option value="supportive" {% if profile.tone == 'supportive' %}selected{% endif %}>Supportive</option>
+                    <option value="balanced" {% if profile.tone == 'balanced' or not profile.tone %}selected{% endif %}>Balanced</option>
+                    <option value="direct" {% if profile.tone == 'direct' %}selected{% endif %}>Direct</option>
+                </select>
+            </div>
+            <button type="submit" class="w-full py-3 bg-brand-600 text-white rounded-md font-medium hover:bg-brand-700">Save Profile</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('profileForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+        full_name: document.getElementById('full_name').value,
+        target_role: document.getElementById('target_role').value,
+        industry: document.getElementById('industry').value,
+        years_experience: document.getElementById('years_experience').value,
+        tone: document.getElementById('tone').value
+    };
+    const res = await fetch('/profile', { method: 'POST', headers: csrfHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify(payload) });
+    if (res.ok) showToast('Profile saved', 'success');
+    else showToast('Failed to save', 'error');
+});
+</script>
+{% endblock %}

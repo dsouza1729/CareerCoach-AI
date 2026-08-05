@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Welcome - CareerCoach{% endblock %}
+{% block content %}
+<div class="max-w-xl mx-auto py-12 px-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Let's personalize your coach</h1>
+        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">This helps the AI tailor advice to your goals.</p>
+        <form id="onboardingForm" class="mt-8 space-y-5">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Full name</label>
+                <input type="text" id="full_name" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2" placeholder="Jane Doe">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Target role</label>
+                <input type="text" id="target_role" required class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2" placeholder="Senior Software Engineer">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Industry</label>
+                <input type="text" id="industry" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2" placeholder="Technology">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Years of experience</label>
+                <select id="years_experience" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2">
+                    <option value="0-1">0–1 years</option>
+                    <option value="2-4" selected>2–4 years</option>
+                    <option value="5-9">5–9 years</option>
+                    <option value="10+">10+ years</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Coaching tone</label>
+                <select id="tone" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2">
+                    <option value="supportive">Supportive</option>
+                    <option value="balanced" selected>Balanced</option>
+                    <option value="direct">Direct</option>
+                </select>
+            </div>
+            <button type="submit" class="w-full py-3 bg-brand-600 text-white rounded-md font-medium hover:bg-brand-700">Continue to Dashboard</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('onboardingForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+        full_name: document.getElementById('full_name').value,
+        target_role: document.getElementById('target_role').value,
+        industry: document.getElementById('industry').value,
+        years_experience: document.getElementById('years_experience').value,
+        tone: document.getElementById('tone').value
+    };
+    const res = await fetch('/onboarding', { method: 'POST', headers: csrfHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify(payload) });
+    const data = await res.json();
+    if (res.ok) window.location.href = data.redirect || '/dashboard';
+    else showToast(data.detail || 'Failed to save profile', 'error');
+});
+</script>
+{% endblock %}

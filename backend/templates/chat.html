@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}AI Career Coach{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto mt-8 px-4 sm:px-6 lg:px-8 flex flex-col h-[calc(100vh-8rem)]">
+    <div class="bg-white dark:bg-gray-800 px-6 py-4 border-b border-gray-200 dark:border-gray-700 rounded-t-lg shadow-sm flex items-center justify-between">
+        <div>
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white">Your AI Career Coach</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+                {% if profile.full_name %}Hi {{ profile.full_name }} — {% endif %}Ask about careers, resumes, or interviews.
+            </p>
+        </div>
+        <div class="flex items-center gap-3">
+            <span id="usageBadge" class="text-xs text-gray-500 dark:text-gray-400 hidden"></span>
+            <button type="button" id="clearChatBtn" class="text-xs text-gray-500 hover:text-red-600">Clear chat</button>
+            <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-brand-500"></span></span>
+        </div>
+    </div>
+    <div id="chat-messages" class="flex-grow bg-gray-50 dark:bg-gray-900/50 p-6 overflow-y-auto border-x border-gray-200 dark:border-gray-700 shadow-inner space-y-4">
+        {% if history|length == 0 %}
+        <div class="flex items-start">
+            <div class="flex-shrink-0 bg-brand-100 dark:bg-brand-900 rounded-full p-2"><svg class="h-6 w-6 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div>
+            <div class="ml-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl rounded-tl-none px-4 py-3 shadow-sm max-w-[85%]">
+                <p class="text-gray-800 dark:text-gray-200 text-sm leading-relaxed whitespace-pre-wrap">Hello! I am your AI Career Coach. How can I help you accelerate your career today?</p>
+            </div>
+        </div>
+        {% endif %}
+        {% for msg in history %}
+            {% if msg.role == 'ai' %}
+            <div class="flex items-start">
+                <div class="flex-shrink-0 bg-brand-100 dark:bg-brand-900 rounded-full p-2"><svg class="h-6 w-6 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div>
+                <div class="ml-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl rounded-tl-none px-4 py-3 shadow-sm max-w-[85%]">
+                    <p class="text-gray-800 dark:text-gray-200 text-sm leading-relaxed whitespace-pre-wrap">{{ msg.content }}</p>
+                </div>
+            </div>
+            {% else %}
+            <div class="flex items-start justify-end">
+                <div class="mr-3 bg-brand-600 rounded-2xl rounded-tr-none px-4 py-3 shadow-sm max-w-[85%]"><p class="text-white text-sm whitespace-pre-wrap">{{ msg.content }}</p></div>
+                <div class="flex-shrink-0 bg-gray-200 dark:bg-gray-700 rounded-full p-2"><svg class="h-6 w-6 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div class="bg-white dark:bg-gray-800 px-4 py-4 border-t border-gray-200 dark:border-gray-700 rounded-b-lg shadow-sm">
+        <form id="chatForm" class="flex space-x-3">
+            <input type="text" id="messageInput" autocomplete="off" required class="flex-1 focus:ring-brand-500 focus:border-brand-500 block w-full rounded-md sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-4 py-3" placeholder="Type your message...">
+            <button type="submit" id="sendBtn" class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white bg-brand-600 hover:bg-brand-700">Send</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const chatMessages = document.getElementById('chat-messages');
+const messageInput = document.getElementById('messageInput');
+const sendBtn = document.getElementById('sendBtn');
+
+function scrollToBottom() { chatMessages.scrollTop = chatMessages.scrollHeight; }
+function escapeHtml(text) {
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function appendAiMessage(text) {
+    const aiDiv = document.createElement('div');
+    aiDiv.className = 'flex items-start';
+    aiDiv.innerHTML = `
+        <div class="flex-shrink-0 bg-brand-100 dark:bg-brand-900 rounded-full p-2">
+            <svg class="h-6 w-6 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+        </div>
+        <div class="ml-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl rounded-tl-none px-4 py-3 shadow-sm max-w-[85%]">
+            <p class="text-gray-800 dark:text-gray-200 text-sm leading-relaxed whitespace-pre-wrap"></p>
+        </div>`;
+    aiDiv.querySelector('p').textContent = text;
+    chatMessages.appendChild(aiDiv);
+}
+
+scrollToBottom();
+
+async function loadUsage() {
+    try {
+        const res = await fetch('/api/usage');
+        const data = await res.json();
+        const badge = document.getElementById('usageBadge');
+        badge.textContent = `${data.remaining}/${data.limit} AI requests left ${data.window_label || 'this hour'}`;
+        badge.classList.remove('hidden');
+    } catch {}
+}
+loadUsage();
+
+document.getElementById('clearChatBtn').addEventListener('click', async () => {
+    if (!confirm('Clear all chat history?')) return;
+    await fetch('/chat', { method: 'POST', headers: csrfHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify({ action: 'clear' }) });
+    window.location.reload();
+});
+
+document.getElementById('chatForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const text = messageInput.value.trim();
+    if (!text) return;
+
+    const userDiv = document.createElement('div');
+    userDiv.className = 'flex items-start justify-end';
+    userDiv.innerHTML = `<div class="mr-3 bg-brand-600 rounded-2xl rounded-tr-none px-4 py-3 shadow-sm max-w-[85%]"><p class="text-white text-sm whitespace-pre-wrap">${escapeHtml(text)}</p></div><div class="flex-shrink-0 bg-gray-200 dark:bg-gray-700 rounded-full p-2"><svg class="h-6 w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></div>`;
+    chatMessages.appendChild(userDiv);
+    messageInput.value = '';
+    messageInput.disabled = true;
+    sendBtn.disabled = true;
+    scrollToBottom();
+
+    const loadingDiv = document.createElement('div');
+    loadingDiv.id = 'loading-indicator';
+    loadingDiv.className = 'flex items-start';
+    loadingDiv.innerHTML = '<div class="flex-shrink-0 bg-brand-100 rounded-full p-2"><svg class="h-6 w-6 text-brand-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div><div class="ml-3 bg-white dark:bg-gray-800 border rounded-2xl rounded-tl-none px-4 py-3"><span class="text-sm text-gray-500">Thinking...</span></div>';
+    chatMessages.appendChild(loadingDiv);
+    scrollToBottom();
+
+    try {
+        const response = await fetch('/chat', { method: 'POST', headers: csrfHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify({ message: text }) });
+        document.getElementById('loading-indicator')?.remove();
+        const data = await response.json();
+        if (!response.ok) { showToast(data.response || data.error || 'Error', 'error'); return; }
+        appendAiMessage(data.response || '');
+        loadUsage();
+    } catch {
+        document.getElementById('loading-indicator')?.remove();
+        showToast('Error communicating with AI', 'error');
+    } finally {
+        messageInput.disabled = false;
+        sendBtn.disabled = false;
+        messageInput.focus();
+        scrollToBottom();
+    }
+});
+</script>
+{% endblock %}

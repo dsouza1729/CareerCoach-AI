@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Career Assessment - CareerCoach{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto py-10 px-4">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Career Assessment</h1>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Discover your strengths, growth areas, and recommended next steps.</p>
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <p class="text-sm text-gray-600 dark:text-gray-400">We'll use your profile{% if profile.target_role %} (target: {{ profile.target_role }}){% endif %} to generate a personalized assessment.</p>
+        <div class="mt-4">
+            <label class="block text-sm font-medium">Anything else we should know?</label>
+            <textarea id="notes" rows="3" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 p-3 text-sm" placeholder="Career goals, challenges, interests..."></textarea>
+        </div>
+        <button id="assessBtn" class="mt-4 py-3 px-6 bg-brand-600 text-white rounded-md font-medium hover:bg-brand-700">Run Assessment</button>
+    </div>
+    <div id="results" class="hidden mt-8 space-y-6">
+        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+            <h2 class="font-semibold text-gray-900 dark:text-white">Career fit score</h2>
+            <p id="fitScore" class="text-4xl font-bold text-brand-600 mt-2">—</p>
+            <p id="summary" class="mt-2 text-sm text-gray-600 dark:text-gray-300"></p>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-6">
+            <div class="bg-white dark:bg-gray-800 rounded-xl border p-6">
+                <h3 class="font-semibold text-green-600">Strengths</h3>
+                <ul id="strengths" class="mt-2 list-disc list-inside text-sm text-gray-600 dark:text-gray-300"></ul>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl border p-6">
+                <h3 class="font-semibold text-orange-600">Growth areas</h3>
+                <ul id="growth" class="mt-2 list-disc list-inside text-sm text-gray-600 dark:text-gray-300"></ul>
+            </div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 rounded-xl border p-6">
+            <h3 class="font-semibold">Recommended next steps</h3>
+            <ol id="nextSteps" class="mt-2 list-decimal list-inside text-sm text-gray-600 dark:text-gray-300"></ol>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('assessBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('assessBtn');
+    btn.disabled = true;
+    const res = await fetch('/career-assessment', {
+        method: 'POST',
+        headers: csrfHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ notes: document.getElementById('notes').value })
+    });
+    const data = await res.json();
+    btn.disabled = false;
+    if (!res.ok) { showToast(data.error || 'Assessment failed', 'error'); return; }
+    document.getElementById('results').classList.remove('hidden');
+    document.getElementById('fitScore').textContent = (data.career_fit_score || data.fit_score || '—') + (typeof data.career_fit_score === 'number' ? '/100' : '');
+    document.getElementById('summary').textContent = data.summary || '';
+    const fillList = (id, items) => {
+        const el = document.getElementById(id);
+        el.replaceChildren();
+        (items || []).forEach(i => { const li = document.createElement('li'); li.textContent = i; el.appendChild(li); });
+    };
+    fillList('strengths', data.strengths);
+    fillList('growth', data.weaknesses || data.growth_areas);
+    fillList('nextSteps', data.recommendations || data.recommended_next_steps);
+    showToast('Assessment complete', 'success');
+});
+</script>
+{% endblock %}

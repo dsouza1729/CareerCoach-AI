@@ -1,0 +1,9 @@
+Flask==3.0.2
+Flask-WTF==1.2.1
+python-dotenv==1.0.1
+requests==2.34.2
+pypdf==5.0.0
+pytest==8.3.5
+python-docx==1.1.2
+pg8000==1.31.2
+gunicorn

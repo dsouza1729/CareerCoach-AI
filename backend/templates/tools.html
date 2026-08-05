@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}AI Tools - CareerCoach{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">All AI Tools</h1>
+        <p class="mt-2 text-gray-500 dark:text-gray-400">Everything you need to land your next role.</p>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% set tools = [
+            ('/chat', 'AI Chat Coach', 'Personalized career guidance', 'blue'),
+            ('/resume', 'Resume Analyzer', 'ATS score & improvements', 'purple'),
+            ('/job-match', 'Job Match', 'Compare resume to job posting', 'indigo'),
+            ('/cover-letter', 'Cover Letter', 'Tailored cover letters', 'pink'),
+            ('/linkedin', 'LinkedIn Summary', 'Professional headline & about', 'sky'),
+            ('/salary', 'Salary Advisor', 'Negotiation & range insights', 'emerald'),
+            ('/interview', 'Mock Interview', 'Practice with AI feedback', 'red'),
+            ('/career-assessment', 'Career Assessment', 'Strengths & next steps', 'orange')
+        ] %}
+        {% for href, title, desc, color in tools %}
+        <a href="{{ href }}" class="group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-shadow">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-brand-600">{{ title }}</h3>
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ desc }}</p>
+            <span class="mt-4 inline-block text-sm text-brand-600 font-medium">Open tool →</span>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

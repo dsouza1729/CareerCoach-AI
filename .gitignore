@@ -1,0 +1,22 @@
+# Environment and secrets
+backend/.env
+backend/venv/
+backend/.venv/
+*.db
+*.sqlite3
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Debug session logs
+debug-*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

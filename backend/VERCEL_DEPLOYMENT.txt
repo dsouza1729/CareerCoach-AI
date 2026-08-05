@@ -1,0 +1,70 @@
+VERCEL DEPLOYMENT GUIDE
+
+To  launch  this  Python-based  website on Vercel, follow these steps.
+Since  Vercel  is  optimized  for  frontend  frameworks and serverless
+functions,  deploying  a  Python  app (like FastAPI or Flask) requires
+some configuration.
+
+IMPORTANT: DATABASE LIMITATIONS You are currently using a local SQLite
+database  (career_coach.db).  Vercel's  environment  is  read-only and
+serverless  functions are ephemeral, which means any changes made to a
+local  SQLite  database  will  be  lost. You will need to migrate your
+database to a cloud provider before deploying.
+
+
+STEP 1: MIGRATE THE DATABASE
+Before deploying, you must migrate away from SQLite. 
+1. Choose a cloud database provider like Vercel Postgres, Supabase, Neon, or PlanetScale.
+2. Update your database.py and .env to connect to your new cloud database URI instead of the local .db file.
+
+STEP 2: CONFIGURE VERCEL.JSON Vercel needs to know how to build and
+route  your  Python application. In the root of your project, create a
+file named vercel.json:
+
+{
+  "builds": [
+    {
+      "src": "app.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "app.py"
+    }
+  ]
+}
+
+(Note:  If  your main entry point is named differently, replace app.py
+with  your  entry  file.  Vercel  looks  for an 'app' or 'application'
+object inside this file.)
+
+STEP 3: SPECIFY PYTHON VERSION Vercel uses Python 3.9 by default. If
+your app requires a different version, you can specify it. Just ensure
+all your required packages are listed in requirements.txt.
+
+
+STEP 4: PUSH TO GITHUB
+The easiest way to deploy to Vercel is through GitHub (or GitLab/Bitbucket).
+1. Make sure your vercel.json, updated database.py, and requirements.txt are committed.
+2. Push your code to a repository on GitHub.
+
+
+STEP 5: DEPLOY VIA VERCEL DASHBOARD
+1. Go to https://vercel.com/ and sign in.
+2. Click Add New -> Project.
+3. Import your GitHub repository.
+4. Important: In the configuration section before clicking deploy:
+   - Expand the Environment Variables section.
+   - Copy all the variables from your local .env file (like API keys and your new cloud database URL) and paste them here.
+   - Make sure your "Root Directory" is set correctly. If your app.py and vercel.json are inside the backend folder, set the Root Directory to 'backend'.
+5. Click Deploy.
+
+
+ALTERNATIVE: DEPLOYING VIA VERCEL CLI
+If you prefer not to use GitHub, you can deploy directly from your terminal:
+1. Install the CLI: npm i -g vercel
+2. Open your terminal in your project directory (c:\Users\Darrel\Desktop\ai\openai\backend).
+3. Run the command: vercel
+4. Follow the prompts to log in and set up the project. Once it works, run 'vercel --prod' to push it to a production domain. Ensure you add your environment variables to the Vercel dashboard afterward!

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Log In - AI Personal Career Coach{% endblock %}
+
+{% block content %}
+<div class="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 mt-10">
+  <div class="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-10 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
+    <div>
+      <h2 class="mt-2 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+        Sign in to your account
+      </h2>
+      <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+        Or
+        <a href="/signup" class="font-medium text-brand-600 hover:text-brand-500 transition-colors">
+          start your 14-day free trial
+        </a>
+      </p>
+    </div>
+    <form class="mt-8 space-y-6" id="loginForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="rounded-md shadow-sm -space-y-px">
+        <div>
+          <label for="email-address" class="sr-only">Email address</label>
+          <input id="email-address" name="username" type="email" autocomplete="email" required class="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 rounded-t-md focus:outline-none focus:ring-brand-500 focus:border-brand-500 focus:z-10 sm:text-sm" placeholder="Email address">
+        </div>
+        <div>
+          <label for="password" class="sr-only">Password</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required class="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 rounded-b-md focus:outline-none focus:ring-brand-500 focus:border-brand-500 focus:z-10 sm:text-sm" placeholder="Password">
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-brand-600 focus:ring-brand-500 border-gray-300 rounded">
+          <label for="remember-me" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">Remember me</label>
+        </div>
+        <a href="/forgot-password" class="text-sm text-brand-600 hover:text-brand-500">Forgot password?</a>
+      </div>
+
+      <div>
+        <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-colors">
+          Sign in
+        </button>
+      </div>
+      <div id="errorMessage" class="hidden text-red-500 text-sm text-center mt-2"></div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const errorMessage = document.getElementById('errorMessage');
+    errorMessage.classList.add('hidden');
+    
+    try {
+        const response = await fetch('/login', {
+            method: 'POST',
+            body: formData // OAuth2PasswordRequestForm expects form data
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            window.location.href = data.redirect || '/dashboard';
+        } else {
+            const data = await response.json();
+            errorMessage.textContent = data.detail || 'Login failed';
+            errorMessage.classList.remove('hidden');
+        }
+    } catch (error) {
+        errorMessage.textContent = 'An error occurred';
+        errorMessage.classList.remove('hidden');
+    }
+});
+</script>
+{% endblock %}

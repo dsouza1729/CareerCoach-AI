@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - AI Career Coach{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white">
+                {% if profile.full_name %}Welcome back, {{ profile.full_name }}{% else %}Welcome to your Dashboard{% endif %}
+            </h2>
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                {% if profile.target_role %}Targeting: {{ profile.target_role }}{% else %}Track progress and access AI career tools.{% endif %}
+            </p>
+        </div>
+        <a href="/profile" class="text-sm text-brand-600 hover:underline">Edit profile →</a>
+    </div>
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg border border-gray-100 dark:border-gray-700">
+            <div class="px-4 py-5 sm:p-6"><dt class="text-sm font-medium text-gray-500 truncate">Resumes Analyzed</dt><dd class="mt-1 text-3xl font-semibold text-brand-600">{{ stats.resumes_analyzed }}</dd></div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg border border-gray-100 dark:border-gray-700">
+            <div class="px-4 py-5 sm:p-6"><dt class="text-sm font-medium text-gray-500 truncate">Chat Messages</dt><dd class="mt-1 text-3xl font-semibold text-brand-600">{{ stats.chat_messages }}</dd></div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg border border-gray-100 dark:border-gray-700">
+            <div class="px-4 py-5 sm:p-6"><dt class="text-sm font-medium text-gray-500 truncate">Interviews Practiced</dt><dd class="mt-1 text-3xl font-semibold text-brand-600">{{ stats.interviews_done }}</dd></div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg border border-gray-100 dark:border-gray-700">
+            <div class="px-4 py-5 sm:p-6"><dt class="text-sm font-medium text-gray-500 truncate">AI Usage ({{ stats.ai_window_label or 'this hour' }})</dt><dd class="mt-1 text-3xl font-semibold text-brand-600">{{ stats.ai_used_this_hour }}/{{ stats.ai_limit }}</dd></div>
+        </div>
+    </div>
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Your Tools</h3>
+        <a href="/tools" class="text-sm text-brand-600 hover:underline">View all →</a>
+    </div>
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {% set cards = [
+            ('/chat', 'AI Chat Coach', 'Personalized career guidance', 'blue'),
+            ('/resume', 'Resume Analyzer', 'ATS score & improvements', 'purple'),
+            ('/job-match', 'Job Match', 'Compare resume to posting', 'indigo'),
+            ('/cover-letter', 'Cover Letter', 'Tailored cover letters', 'pink'),
+            ('/interview', 'Mock Interviews', 'Practice with AI feedback', 'red'),
+            ('/linkedin', 'LinkedIn Summary', 'Professional About section', 'sky'),
+            ('/salary', 'Salary Advisor', 'Ranges & negotiation tips', 'emerald')
+        ] %}
+        {% for href, title, desc, _ in cards %}
+        <a href="{{ href }}" class="relative group bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white group-hover:text-brand-600">{{ title }}</h3>
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ desc }}</p>
+        </a>
+        {% endfor %}
+    </div>
+    {% if stats.resumes_analyzed == 0 and stats.chat_messages == 0 %}
+    <div class="mt-10 bg-brand-50 dark:bg-brand-900/20 border border-brand-100 dark:border-brand-800 rounded-xl p-6 text-center">
+        <h4 class="font-semibold text-gray-900 dark:text-white">Get started</h4>
+        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Upload your resume or start a chat with your AI coach.</p>
+        <div class="mt-4 flex justify-center gap-4">
+            <a href="/resume" class="px-4 py-2 bg-brand-600 text-white rounded-md text-sm">Upload Resume</a>
+            <a href="/chat" class="px-4 py-2 border border-brand-600 text-brand-600 rounded-md text-sm">Start Chat</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

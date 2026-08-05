@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block title %}Salary Advisor - CareerCoach{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto py-10 px-4">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Salary Advisor</h1>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Get localized salary ranges in your preferred currency and pay period.</p>
+
+    <form id="salaryForm" class="mt-8 space-y-6">
+        <div class="grid sm:grid-cols-2 gap-4">
+            <div class="sm:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Role</label>
+                <input type="text" id="role" value="{{ profile.target_role or 'Software Engineer' }}" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Location</label>
+                <select id="location" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2">
+                    {% for group in locations %}
+                    <optgroup label="{{ group.group }}">
+                        {% for opt in group.options %}
+                        <option value="{{ opt.value }}" data-currency="{{ opt.currency }}" {% if opt.value == 'Remote (global)' %}selected{% endif %}>{{ opt.label }}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Experience level</label>
+                <select id="experience" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2">
+                    {% for level in experience_levels %}
+                    <option value="{{ level.value }}" {% if level.value == default_experience %}selected{% endif %}>{{ level.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="bg-gray-50 dark:bg-gray-800/60 rounded-xl border border-gray-200 dark:border-gray-700 p-5 space-y-4">
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">Compensation unit</h2>
+            <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Currency</label>
+                    <select id="currency" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2">
+                        {% for code, meta in currencies.items() %}
+                        <option value="{{ code }}" {% if code == 'USD' %}selected{% endif %}>{{ meta.symbol }} {{ meta.name }} ({{ code }})</option>
+                        {% endfor %}
+                    </select>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Auto-suggested when you pick a location.</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pay period</label>
+                    <select id="pay_period" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2">
+                        {% for key, meta in pay_periods.items() %}
+                        <option value="{{ key }}">{{ meta.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" id="submitBtn" class="w-full py-3 bg-brand-600 text-white rounded-md font-medium hover:bg-brand-700">Get salary advice</button>
+    </form>
+
+    <div id="results" class="hidden mt-8 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-5">
+        <div>
+            <p id="rangeSummary" class="text-lg font-semibold text-gray-900 dark:text-white"></p>
+            <p id="unitSummary" class="text-sm text-gray-500 dark:text-gray-400 mt-1"></p>
+        </div>
+
+        <div class="grid sm:grid-cols-3 gap-4 text-center">
+            <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                <p class="text-xs text-gray-500 uppercase">25th percentile</p>
+                <p id="salaryLow" class="text-xl font-bold text-gray-900 dark:text-white mt-1">—</p>
+            </div>
+            <div class="p-4 bg-brand-50 dark:bg-brand-900/30 rounded-lg ring-1 ring-brand-200 dark:ring-brand-800">
+                <p class="text-xs text-brand-600 uppercase font-medium">Median</p>
+                <p id="salaryMedian" class="text-2xl font-bold text-brand-600 mt-1">—</p>
+            </div>
+            <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                <p class="text-xs text-gray-500 uppercase">75th percentile</p>
+                <p id="salaryHigh" class="text-xl font-bold text-gray-900 dark:text-white mt-1">—</p>
+            </div>
+        </div>
+
+        <div>
+            <h3 class="font-semibold text-gray-900 dark:text-white">Negotiation tips</h3>
+            <ul id="tips" class="mt-2 list-disc list-inside text-sm text-gray-600 dark:text-gray-300 space-y-1"></ul>
+        </div>
+        <div>
+            <h3 class="font-semibold text-gray-900 dark:text-white">What to say</h3>
+            <p id="script" class="mt-2 text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap"></p>
+        </div>
+        <div>
+            <h3 class="font-semibold text-gray-900 dark:text-white">Market insights</h3>
+            <p id="insights" class="mt-2 text-sm text-gray-600 dark:text-gray-300"></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const locationSelect = document.getElementById('location');
+const currencySelect = document.getElementById('currency');
+
+function syncCurrencyFromLocation() {
+    const suggested = locationSelect.selectedOptions[0]?.dataset.currency;
+    if (suggested) {
+        const match = [...currencySelect.options].find(opt => opt.value === suggested);
+        if (match) currencySelect.value = suggested;
+    }
+}
+
+locationSelect.addEventListener('change', syncCurrencyFromLocation);
+
+document.getElementById('salaryForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Calculating…';
+
+    const payload = {
+        role: document.getElementById('role').value,
+        location: locationSelect.value,
+        experience: document.getElementById('experience').value,
+        currency: currencySelect.value,
+        pay_period: document.getElementById('pay_period').value,
+    };
+
+    try {
+        const res = await fetch('/salary', {
+            method: 'POST',
+            headers: csrfHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            showToast(data.error || 'Failed to get advice', 'error');
+            return;
+        }
+
+        document.getElementById('results').classList.remove('hidden');
+        document.getElementById('rangeSummary').textContent = data.estimated_range || '—';
+        document.getElementById('unitSummary').textContent =
+            `${data.location || payload.location} · ${data.experience || payload.experience} · ${data.currency_name || data.currency} · ${data.pay_period_label || payload.pay_period}`;
+
+        document.getElementById('salaryLow').textContent = data.formatted_low || '—';
+        document.getElementById('salaryMedian').textContent = data.formatted_median || '—';
+        document.getElementById('salaryHigh').textContent = data.formatted_high || '—';
+        document.getElementById('script').textContent = data.negotiation_script || '';
+        document.getElementById('insights').textContent = data.market_insights || '';
+
+        const tips = document.getElementById('tips');
+        tips.replaceChildren();
+        (data.talking_points || []).forEach(t => {
+            const li = document.createElement('li');
+            li.textContent = t;
+            tips.appendChild(li);
+        });
+
+        showToast('Salary advice ready', 'success');
+    } catch {
+        showToast('Request failed', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Get salary advice';
+    }
+});
+</script>
+{% endblock %}

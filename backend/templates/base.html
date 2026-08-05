@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="description" content="AI-powered career coaching — resume analysis, interview prep, salary advice, and more.">
+    <meta property="og:title" content="CareerCoach AI">
+    <meta property="og:description" content="Accelerate your career with AI coaching.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect rx='20' width='100' height='100' fill='%2316a34a'/><text x='50' y='62' font-size='42' fill='white' text-anchor='middle' font-family='sans-serif' font-weight='bold'>AI</text></svg>">
+    <title>{% block title %}AI Personal Career Coach{% endblock %}</title>
+    <script src="{{ url_for('static', filename='vendor/tailwindcss.js') }}"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 50: '#f0fdf4', 100: '#dcfce7', 500: '#22c55e', 600: '#16a34a', 900: '#14532d' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/inter.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <script src="{{ url_for('static', filename='vendor/marked.min.js') }}"></script>
+    <style>body { font-family: 'Inter', system-ui, sans-serif; }</style>
+</head>
+<body class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 min-h-screen flex flex-col antialiased transition-colors">
+
+    {% set path = request.path %}
+
+    <header class="site-header sticky top-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-200/80 dark:border-gray-700/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="{% if session.get('user_id') %}/dashboard{% else %}/{% endif %}" class="flex items-center gap-2 shrink-0">
+                    <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white text-xs font-bold">AI</span>
+                    <span class="text-lg font-semibold tracking-tight text-gray-900 dark:text-white">CareerCoach</span>
+                </a>
+
+                <!-- Desktop nav -->
+                <div class="hidden md:flex items-center gap-1">
+                    {% if session.get('user_id') %}
+                    <nav class="flex items-center gap-0.5 mr-2" aria-label="Main">
+                        <a href="/dashboard" class="site-nav-link{% if path == '/dashboard' %} is-active{% endif %}">Home</a>
+                        <a href="/chat" class="site-nav-link{% if path == '/chat' %} is-active{% endif %}">Coach</a>
+                        <a href="/resume" class="site-nav-link{% if path == '/resume' %} is-active{% endif %}">Resume</a>
+                        <a href="/interview" class="site-nav-link{% if path == '/interview' %} is-active{% endif %}">Interview</a>
+                        <a href="/tools" class="site-nav-link{% if path == '/tools' %} is-active{% endif %}">Tools</a>
+                    </nav>
+                    <div class="flex items-center gap-1 pl-2 border-l border-gray-200 dark:border-gray-700">
+                        <a href="/profile" class="site-nav-link{% if path == '/profile' %} is-active{% endif %}">Account</a>
+                        <button id="dark-mode-btn" type="button" class="site-icon-btn dark-mode-toggle" aria-label="Toggle dark mode">
+                            <svg class="h-5 w-5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+                            <svg class="h-5 w-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m8.66-9h-1M4.34 12h-1M18.364 5.636l-.707.707M6.343 17.657l-.707.707M18.364 18.364l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+                        </button>
+                        <a href="/logout" class="site-nav-cta ml-1">Sign out</a>
+                    </div>
+                    {% else %}
+                    <nav class="flex items-center gap-0.5 mr-3" aria-label="Main">
+                        <a href="/features" class="site-nav-link{% if path == '/features' %} is-active{% endif %}">Features</a>
+                    </nav>
+                    <button id="dark-mode-btn-guest" type="button" class="site-icon-btn dark-mode-toggle" aria-label="Toggle dark mode">
+                        <svg class="h-5 w-5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+                        <svg class="h-5 w-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m8.66-9h-1M4.34 12h-1M18.364 5.636l-.707.707M6.343 17.657l-.707.707M18.364 18.364l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+                    </button>
+                    <a href="/login" class="site-nav-link ml-1">Sign in</a>
+                    <a href="/signup" class="site-nav-cta site-nav-cta-primary ml-1">Get started</a>
+                    {% endif %}
+                </div>
+
+                <!-- Mobile toggle -->
+                <div class="md:hidden flex items-center gap-1">
+                    <button id="dark-mode-btn-mobile" type="button" class="site-icon-btn dark-mode-toggle" aria-label="Toggle dark mode">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m8.66-9h-1M4.34 12h-1M18.364 5.636l-.707.707M6.343 17.657l-.707.707M18.364 18.364l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+                    </button>
+                    <button id="mobile-menu-btn" type="button" class="site-icon-btn" aria-label="Open menu">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-4">
+            {% if session.get('user_id') %}
+            <p class="text-xs font-medium uppercase tracking-wider text-gray-400 mb-2">Workspace</p>
+            <div class="space-y-0.5 mb-4">
+                <a href="/dashboard" class="mobile-nav-link{% if path == '/dashboard' %} is-active{% endif %}">Home</a>
+                <a href="/chat" class="mobile-nav-link{% if path == '/chat' %} is-active{% endif %}">Coach</a>
+                <a href="/resume" class="mobile-nav-link{% if path == '/resume' %} is-active{% endif %}">Resume</a>
+                <a href="/interview" class="mobile-nav-link{% if path == '/interview' %} is-active{% endif %}">Interview</a>
+                <a href="/tools" class="mobile-nav-link{% if path == '/tools' %} is-active{% endif %}">All tools</a>
+            </div>
+            <p class="text-xs font-medium uppercase tracking-wider text-gray-400 mb-2">Account</p>
+            <div class="space-y-0.5">
+                <a href="/profile" class="mobile-nav-link{% if path == '/profile' %} is-active{% endif %}">Profile</a>
+                <a href="/logout" class="mobile-nav-link text-red-600 dark:text-red-400">Sign out</a>
+            </div>
+            {% else %}
+            <div class="space-y-0.5">
+                <a href="/features" class="mobile-nav-link{% if path == '/features' %} is-active{% endif %}">Features</a>
+                <a href="/login" class="mobile-nav-link{% if path == '/login' %} is-active{% endif %}">Sign in</a>
+                <a href="/signup" class="mobile-nav-link is-active text-brand-600 dark:text-brand-400 font-medium">Get started</a>
+            </div>
+            {% endif %}
+        </div>
+    </header>
+
+    <main class="flex-grow">{% block content %}{% endblock %}</main>
+
+    <footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 mt-auto">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm">
+                <div>
+                    <p class="font-semibold text-gray-900 dark:text-white">CareerCoach AI</p>
+                    <p class="mt-1 text-gray-500 dark:text-gray-400">Your AI-powered career companion.</p>
+                </div>
+                <div class="flex flex-wrap gap-x-6 gap-y-2 text-gray-500 dark:text-gray-400">
+                    <a href="/features" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">Features</a>
+                    {% if session.get('user_id') %}
+                    <a href="/tools" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">Tools</a>
+                    {% else %}
+                    <a href="/login" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">Sign in</a>
+                    <a href="/signup" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">Get started</a>
+                    {% endif %}
+                </div>
+                <p class="text-gray-400 dark:text-gray-500">&copy; 2026 CareerCoach AI</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script>
+        function getCsrfToken() { return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''; }
+        function csrfHeaders(extra = {}) { return { 'X-CSRFToken': getCsrfToken(), ...extra }; }
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
