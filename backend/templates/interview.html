@@ -1,119 +1,317 @@
 {% extends "base.html" %}
 {% block title %}Mock Interview - AI Career Coach{% endblock %}
 {% block content %}
-<div class="max-w-5xl mx-auto py-10 px-4">
-    <div class="mb-8 border-b border-gray-200 dark:border-gray-700 pb-5">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">AI Mock Interview</h2>
-        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Behavioral, technical, or leadership questions with instant feedback.</p>
+<style>
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+</style>
+
+<div class="relative min-h-[calc(100vh-8rem)]">
+    <!-- Background Blobs -->
+    <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-24 -left-24 w-96 h-96 bg-brand-400/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-400/10 rounded-full blur-3xl"></div>
     </div>
-    <div class="grid lg:grid-cols-3 gap-8">
-        <div class="lg:col-span-2 space-y-6">
-            <div id="configPanel" class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-                <h3 class="font-medium text-gray-900 dark:text-white">Start a session</h3>
-                <div class="mt-4 flex flex-col sm:flex-row gap-3">
-                    <input type="text" id="targetRole" class="flex-1 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-4 py-2" placeholder="Target role">
-                    <select id="interviewMode" class="rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2">
-                        <option value="behavioral">Behavioral</option>
-                        <option value="technical">Technical</option>
-                        <option value="leadership">Leadership</option>
-                    </select>
-                    <button type="button" id="startBtn" class="px-4 py-2 bg-brand-600 text-white rounded-md hover:bg-brand-700">Generate</button>
-                </div>
-            </div>
-            <div id="interviewPanel" class="hidden bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-                <div class="p-6 bg-gray-50 dark:bg-gray-900/50 border-b dark:border-gray-700">
-                    <p class="text-xs uppercase text-gray-500">Question</p>
-                    <p id="questionText" class="text-lg font-medium mt-1"></p>
-                </div>
-                <div class="p-6">
-                    <textarea id="answerText" rows="6" class="w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 p-3" placeholder="Your answer..."></textarea>
-                    <div class="mt-4 flex justify-end"><button id="submitBtn" class="px-6 py-3 bg-gray-900 dark:bg-brand-600 text-white rounded-md">Submit</button></div>
-                </div>
-            </div>
-            <div id="feedbackPanel" class="hidden bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-                <div class="flex items-center gap-6">
-                    <div class="text-center"><p class="text-xs text-gray-500 uppercase">Score</p><p id="scoreValue" class="text-5xl font-bold text-brand-600">—</p></div>
-                    <div class="flex-1"><p id="feedbackText" class="text-sm text-gray-600 dark:text-gray-300"></p><p id="idealText" class="mt-3 text-sm bg-brand-50 dark:bg-brand-900/30 p-3 rounded-md"></p></div>
-                </div>
-                <button id="nextQuestionBtn" class="mt-4 text-sm text-brand-600 hover:underline">Try another question</button>
-            </div>
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-                <h3 class="font-medium text-gray-900 dark:text-white">STAR Answer Builder</h3>
-                <div class="mt-4 grid sm:grid-cols-2 gap-3">
-                    <input id="starSituation" placeholder="Situation" class="rounded-md border dark:border-gray-600 dark:bg-gray-900 px-3 py-2 text-sm">
-                    <input id="starTask" placeholder="Task" class="rounded-md border dark:border-gray-600 dark:bg-gray-900 px-3 py-2 text-sm">
-                    <input id="starAction" placeholder="Action" class="rounded-md border dark:border-gray-600 dark:bg-gray-900 px-3 py-2 text-sm">
-                    <input id="starResult" placeholder="Result" class="rounded-md border dark:border-gray-600 dark:bg-gray-900 px-3 py-2 text-sm">
-                </div>
-                <button id="starBtn" class="mt-3 px-4 py-2 bg-brand-600 text-white rounded-md text-sm">Format with STAR</button>
-                <p id="starOutput" class="mt-3 text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap hidden"></p>
-            </div>
+
+    <div class="max-w-5xl mx-auto py-6 sm:py-10 px-4 sm:px-6 relative z-10">
+        <div class="mb-10 text-center">
+            <h2 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 tracking-tight">Interview Practice</h2>
+            <p class="mt-3 text-lg text-gray-500 dark:text-gray-400">Behavioral, technical, or leadership questions with instant AI feedback.</p>
         </div>
-        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-            <h3 class="font-medium text-gray-900 dark:text-white">Recent sessions</h3>
-            {% if history|length == 0 %}
-            <p class="mt-4 text-sm text-gray-500">No practice sessions yet.</p>
-            {% else %}
-            <ul class="mt-4 space-y-3">
-                {% for h in history %}
-                <li class="text-sm border-b dark:border-gray-700 pb-3">
-                    <p class="font-medium">{{ h.role }} <span class="text-xs text-gray-500">({{ h.mode }})</span></p>
-                    <p class="text-gray-500 truncate">{{ h.question }}</p>
-                    <p class="text-brand-600 font-semibold">Score: {{ h.score }}/10</p>
-                </li>
-                {% endfor %}
-            </ul>
-            {% endif %}
+        
+        <div class="grid lg:grid-cols-3 gap-6 sm:gap-8">
+            <div class="lg:col-span-2 space-y-4 sm:space-y-6 min-w-0">
+                <!-- Config Panel -->
+                <div id="configPanel" class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl shadow-lg ring-1 ring-gray-900/5 rounded-2xl p-4 sm:p-6 transition-all border border-gray-100 dark:border-gray-700/50">
+                    <h3 class="font-bold text-gray-900 dark:text-white flex items-center gap-2">Customize Session</h3>
+                    <div class="mt-5 flex flex-col sm:flex-row gap-4">
+                        <input type="text" id="targetRole"
+                            class="flex-1 rounded-xl border border-gray-200 dark:border-gray-600/50 bg-gray-50 dark:bg-gray-900/50 px-4 py-3 focus:ring-2 focus:ring-brand-500 outline-none transition-all shadow-inner"
+                            placeholder="Target role (e.g., Software Engineer)">
+                        <select id="interviewMode"
+                            class="rounded-xl border border-gray-200 dark:border-gray-600/50 bg-gray-50 dark:bg-gray-900/50 px-4 py-3 focus:ring-2 focus:ring-brand-500 outline-none transition-all shadow-inner font-medium">
+                            <option value="behavioral">Behavioral</option>
+                            <option value="technical">Technical</option>
+                            <option value="leadership">Leadership</option>
+                        </select>
+                        <button type="button" id="startBtn"
+                            class="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-brand-500/30 active:scale-95 disabled:opacity-50 group flex items-center justify-center gap-2 font-bold uppercase tracking-wider">
+                            <span>Generate</span>
+                            <svg class="w-5 h-5 transform transition-all duration-500 group-hover:rotate-180 group-hover:scale-125" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Previous Panel -->
+                <div id="previousPanel" class="hidden animate-fade-in-up bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl shadow-lg ring-1 ring-gray-900/5 rounded-2xl p-4 sm:p-6 border-l-4 border-brand-500 border border-gray-100 dark:border-gray-700/50">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">Previous Question</h3>
+                        <button id="closePrevBtn" class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-700/50 p-2 rounded-full transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">Question</p>
+                            <p id="prevQuestion" class="text-sm font-medium text-gray-800 dark:text-gray-200 mt-1"></p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">Your Answer</p>
+                            <p id="prevAnswer" class="text-sm text-gray-600 dark:text-gray-400 mt-1 whitespace-pre-wrap italic"></p>
+                        </div>
+                        <div class="bg-gradient-to-r from-gray-50 to-transparent dark:from-gray-900/50 dark:to-transparent p-5 rounded-xl border border-gray-100 dark:border-gray-700/50">
+                            <div class="flex items-center gap-4 mb-2">
+                                <span class="text-xs uppercase tracking-widest font-bold text-gray-500">Score</span>
+                                <span id="prevScore" class="font-extrabold text-brand-600 dark:text-brand-400 text-lg"></span>
+                            </div>
+                            <p id="prevFeedback" class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interview Panel -->
+                <div id="interviewPanel" class="hidden animate-fade-in-up bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl shadow-xl ring-1 ring-gray-900/5 rounded-2xl sm:rounded-3xl overflow-hidden border border-gray-100 dark:border-gray-700/50">
+                    <div class="p-4 sm:p-6 lg:p-8 bg-gradient-to-br from-brand-50 to-transparent dark:from-brand-900/20 dark:to-transparent border-b border-gray-100 dark:border-gray-700/50">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-indigo-600 text-white font-extrabold text-lg shadow-md shrink-0">Q</span>
+                            <p id="questionTitle" class="text-sm uppercase tracking-widest text-brand-600 dark:text-brand-400 font-bold">Interview Question</p>
+                        </div>
+                        <p id="questionText" class="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white leading-relaxed tracking-tight"></p>
+                    </div>
+                    <div class="p-4 sm:p-6 lg:p-8 bg-white/40 dark:bg-gray-800/40">
+                        <textarea id="answerText" rows="5"
+                            class="w-full rounded-2xl border-0 ring-1 ring-inset ring-gray-200 dark:ring-gray-700 bg-white dark:bg-gray-900/50 focus:ring-2 focus:ring-inset focus:ring-brand-600 dark:focus:ring-brand-500 p-5 text-gray-900 dark:text-white shadow-inner resize-y transition-shadow outline-none text-base"
+                            placeholder="Type your brilliant answer here..."></textarea>
+                        <div class="mt-6 flex justify-end">
+                            <button id="submitBtn" class="px-8 py-3.5 bg-gradient-to-r from-gray-900 to-gray-800 dark:from-brand-600 dark:to-indigo-600 hover:from-black hover:to-gray-900 dark:hover:from-brand-500 dark:hover:to-indigo-500 text-white rounded-xl shadow-lg hover:shadow-xl hover:shadow-gray-900/20 dark:hover:shadow-brand-500/30 transition-all duration-300 active:scale-95 font-bold uppercase tracking-wider group flex items-center justify-center gap-3 w-full sm:w-auto">
+                                <span>Submit Answer</span>
+                                <svg class="w-5 h-5 transform transition-all duration-300 group-hover:translate-x-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback Panel -->
+                <div id="feedbackPanel" class="hidden animate-fade-in-up bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl shadow-xl ring-1 ring-gray-900/5 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-gray-100 dark:border-gray-700/50">
+                    <div class="flex flex-col md:flex-row gap-8 items-start">
+                        <div class="text-center md:w-1/4 flex flex-col items-center">
+                            <p class="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-widest mb-2 sm:mb-3">Score</p>
+                            <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gradient-to-br from-brand-100 to-indigo-100 dark:from-gray-800 dark:to-gray-900 border-4 border-brand-500 flex items-center justify-center shadow-lg relative overflow-hidden">
+                                <div class="absolute inset-0 bg-brand-400/20 animate-pulse"></div>
+                                <p id="scoreValue" class="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-brand-600 to-indigo-600 dark:from-brand-400 dark:to-indigo-400 relative z-10">—</p>
+                            </div>
+                        </div>
+                        <div class="flex-1 space-y-4 sm:space-y-5 w-full">
+                            <div class="bg-gray-50/80 dark:bg-gray-900/60 rounded-xl sm:rounded-2xl p-4 sm:p-6 ring-1 ring-inset ring-gray-200 dark:ring-gray-700/50 shadow-sm border-l-4 border-l-indigo-500">
+                                <p class="text-xs sm:text-sm font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mb-2 sm:mb-3">Feedback</p>
+                                <p id="feedbackText" class="text-base text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap"></p>
+                            </div>
+                            <div class="bg-brand-50/80 dark:bg-brand-900/30 rounded-xl sm:rounded-2xl p-4 sm:p-6 ring-1 ring-inset ring-brand-100 dark:ring-brand-800/50 shadow-sm border-l-4 border-l-brand-500">
+                                <p class="text-xs sm:text-sm font-bold uppercase tracking-widest text-brand-600 dark:text-brand-400 mb-2 sm:mb-3">Ideal Answer Points</p>
+                                <p id="idealText" class="text-base text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap font-medium"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="nextQuestionBtn" class="mt-8 w-full py-4 border-2 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all text-base font-bold uppercase tracking-wider">Try another question</button>
+                </div>
+
+                <!-- STAR Answer Builder -->
+                <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl shadow-lg ring-1 ring-gray-900/5 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-gray-100 dark:border-gray-700/50">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="p-2 bg-gradient-to-br from-orange-400 to-pink-500 rounded-lg shadow-sm">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+                        </div>
+                        <h3 class="font-bold text-xl text-gray-900 dark:text-white">STAR Answer Builder</h3>
+                    </div>
+                    <div class="grid sm:grid-cols-2 gap-5">
+                        <div class="relative group">
+                            <input id="starSituation" class="peer w-full rounded-xl border border-gray-200 dark:border-gray-600/50 bg-gray-50 dark:bg-gray-900/50 px-4 pt-6 pb-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none transition-all shadow-inner placeholder-transparent" placeholder="Situation">
+                            <label class="absolute left-4 top-1.5 text-xs font-bold text-gray-400 uppercase tracking-wider transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-brand-500">Situation</label>
+                            <p class="text-xs text-gray-500 mt-1.5 ml-1 italic opacity-0 group-hover:opacity-100 transition-opacity">e.g., The website was loading very slowly</p>
+                        </div>
+                        <div class="relative group">
+                            <input id="starTask" class="peer w-full rounded-xl border border-gray-200 dark:border-gray-600/50 bg-gray-50 dark:bg-gray-900/50 px-4 pt-6 pb-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none transition-all shadow-inner placeholder-transparent" placeholder="Task">
+                            <label class="absolute left-4 top-1.5 text-xs font-bold text-gray-400 uppercase tracking-wider transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-brand-500">Task</label>
+                            <p class="text-xs text-gray-500 mt-1.5 ml-1 italic opacity-0 group-hover:opacity-100 transition-opacity">e.g., I needed to improve load times by 30%</p>
+                        </div>
+                        <div class="relative group">
+                            <input id="starAction" class="peer w-full rounded-xl border border-gray-200 dark:border-gray-600/50 bg-gray-50 dark:bg-gray-900/50 px-4 pt-6 pb-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none transition-all shadow-inner placeholder-transparent" placeholder="Action">
+                            <label class="absolute left-4 top-1.5 text-xs font-bold text-gray-400 uppercase tracking-wider transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-brand-500">Action</label>
+                            <p class="text-xs text-gray-500 mt-1.5 ml-1 italic opacity-0 group-hover:opacity-100 transition-opacity">e.g., I optimized images and added lazy loading</p>
+                        </div>
+                        <div class="relative group">
+                            <input id="starResult" class="peer w-full rounded-xl border border-gray-200 dark:border-gray-600/50 bg-gray-50 dark:bg-gray-900/50 px-4 pt-6 pb-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none transition-all shadow-inner placeholder-transparent" placeholder="Result">
+                            <label class="absolute left-4 top-1.5 text-xs font-bold text-gray-400 uppercase tracking-wider transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-brand-500">Result</label>
+                            <p class="text-xs text-gray-500 mt-1.5 ml-1 italic opacity-0 group-hover:opacity-100 transition-opacity">e.g., Load time dropped by 50%, bounce rate fell</p>
+                        </div>
+                    </div>
+                    <button id="starBtn" class="mt-6 w-full px-6 py-3 bg-gray-900 dark:bg-gray-700 hover:bg-black dark:hover:bg-gray-600 text-white rounded-xl font-bold shadow-md active:scale-95 transition-all">Format with STAR</button>
+                    <div id="starOutputContainer" class="mt-6 hidden animate-fade-in-up rounded-2xl bg-gray-50 dark:bg-gray-900/60 p-5 ring-1 ring-inset ring-gray-200 dark:ring-gray-700/50 border-l-4 border-l-brand-500">
+                        <p id="starOutput" class="text-base text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed font-medium"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- History Panel -->
+            <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl shadow-lg ring-1 ring-gray-900/5 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 transition-all h-fit border border-gray-100 dark:border-gray-700/50 min-w-0">
+                <h3 class="font-bold text-xl text-gray-900 dark:text-white flex items-center gap-3">
+                    <div class="p-2 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-lg shadow-sm">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    Recent Practice
+                </h3>
+                {% if history|length == 0 %}
+                <div class="mt-8 text-center p-6 bg-gray-50 dark:bg-gray-900/50 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
+                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">No practice sessions yet.<br>Generate a question to start!</p>
+                </div>
+                {% else %}
+                <ul class="mt-6 space-y-4">
+                    {% for h in history %}
+                    <li class="group border border-gray-100 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-900/30 rounded-2xl p-4 cursor-pointer hover:shadow-md hover:bg-white dark:hover:bg-gray-800 transition-all history-item active:scale-95"
+                        data-question="{{ h.question | escape }}"
+                        data-answer="{{ h.answer | escape }}"
+                        data-score="{{ h.score }}"
+                        data-feedback="{{ h.feedback | escape }}">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-brand-100 text-brand-800 dark:bg-brand-900/30 dark:text-brand-300 uppercase tracking-wider">
+                                {{ h.mode }}
+                            </span>
+                            <span class="font-extrabold text-brand-600 dark:text-brand-400">{{ h.score }}/10</span>
+                        </div>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate group-hover:text-brand-600 transition-colors" title="{{ h.question }}">{{ h.question }}</p>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <div class="mt-6">
+                    <a href="/interview/history" class="block w-full py-3 px-4 border-2 border-gray-200 dark:border-gray-700/50 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/30 rounded-xl transition-all text-center text-sm font-bold uppercase tracking-wider">View Full History</a>
+                </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
 {% endblock %}
 {% block scripts %}
 <script>
-let currentQuestion = '';
-const startBtn = document.getElementById('startBtn');
-startBtn.addEventListener('click', async () => {
-    const role = document.getElementById('targetRole').value || 'Software Engineer';
-    const mode = document.getElementById('interviewMode').value;
-    startBtn.disabled = true;
-    try {
-        const res = await fetch('/interview', { method: 'POST', headers: csrfHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify({ action: 'generate', role, mode }) });
+    let currentQuestion = '';
+    let lastQuestionData = null;
+    const startBtn = document.getElementById('startBtn');
+    
+    document.getElementById('closePrevBtn').addEventListener('click', () => {
+        document.getElementById('previousPanel').classList.add('hidden');
+    });
+
+    startBtn.addEventListener('click', async () => {
+        const role = document.getElementById('targetRole').value || 'Software Engineer';
+        const mode = document.getElementById('interviewMode').value;
+        startBtn.disabled = true;
+        
+        // Show previous question if we have one
+        if (lastQuestionData) {
+            document.getElementById('prevQuestion').textContent = lastQuestionData.question;
+            document.getElementById('prevAnswer').textContent = lastQuestionData.answer;
+            document.getElementById('prevScore').textContent = lastQuestionData.score + '/10';
+            document.getElementById('prevFeedback').textContent = lastQuestionData.feedback;
+            document.getElementById('previousPanel').classList.remove('hidden');
+        }
+
+        try {
+            const res = await fetch('/interview', { method: 'POST', headers: csrfHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify({ action: 'generate', role, mode }) });
+            const data = await res.json();
+            if (!res.ok) { showToast(data.error || 'Failed', 'error'); return; }
+            
+            // Clean hashtags and markdown
+            let rawQ = (data.question || '').replace(/#/g, '').replace(/\*\*/g, '').trim();
+            
+            let qTitle = "Interview Question";
+            let qBody = rawQ;
+
+            const colonIndex = rawQ.indexOf(':');
+            const newlineIndex = rawQ.indexOf('\n');
+            
+            let splitIndex = -1;
+            
+            if (newlineIndex !== -1 && newlineIndex < 100) {
+                splitIndex = newlineIndex;
+            } else if (colonIndex !== -1 && colonIndex < 100) {
+                splitIndex = colonIndex;
+            }
+
+            if (splitIndex !== -1) {
+                qTitle = rawQ.substring(0, splitIndex).trim();
+                qBody = rawQ.substring(splitIndex + 1).trim();
+            }
+
+            currentQuestion = qBody; // Save just the body for evaluation context
+            document.getElementById('questionTitle').textContent = qTitle;
+            document.getElementById('questionText').textContent = qBody;
+            document.getElementById('answerText').value = '';
+            document.getElementById('interviewPanel').classList.remove('hidden');
+            document.getElementById('feedbackPanel').classList.add('hidden');
+        } finally { startBtn.disabled = false; }
+    });
+    document.getElementById('submitBtn').addEventListener('click', async () => {
+        const answer = document.getElementById('answerText').value.trim();
+        if (!answer) return;
+        
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        
+        try {
+            const res = await fetch('/interview', {
+                method: 'POST', headers: csrfHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify({
+                    action: 'evaluate', question: currentQuestion, answer,
+                    role: document.getElementById('targetRole').value, mode: document.getElementById('interviewMode').value
+                })
+            });
+            const data = await res.json();
+            if (!res.ok) { showToast(data.error || 'Failed', 'error'); return; }
+            
+            // Save for the next round
+            lastQuestionData = {
+                question: currentQuestion,
+                answer: answer,
+                score: data.score,
+                feedback: data.feedback
+            };
+
+            document.getElementById('scoreValue').textContent = data.score;
+            document.getElementById('feedbackText').textContent = data.feedback;
+            document.getElementById('idealText').textContent = data.ideal_answer_points;
+            document.getElementById('feedbackPanel').classList.remove('hidden');
+            document.getElementById('interviewPanel').classList.add('hidden');
+            document.getElementById('previousPanel').classList.add('hidden'); // Hide it during feedback
+            showToast('Answer evaluated', 'success');
+        } finally { submitBtn.disabled = false; }
+    });
+    document.getElementById('nextQuestionBtn').addEventListener('click', () => startBtn.click());
+    document.getElementById('starBtn').addEventListener('click', async () => {
+        const res = await fetch('/interview', {
+            method: 'POST', headers: csrfHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify({
+                action: 'star', situation: document.getElementById('starSituation').value,
+                task: document.getElementById('starTask').value, action_text: document.getElementById('starAction').value,
+                result: document.getElementById('starResult').value
+            })
+        });
         const data = await res.json();
-        if (!res.ok) { showToast(data.error || 'Failed', 'error'); return; }
-        currentQuestion = data.question;
-        document.getElementById('questionText').textContent = currentQuestion;
-        document.getElementById('answerText').value = '';
-        document.getElementById('interviewPanel').classList.remove('hidden');
-        document.getElementById('feedbackPanel').classList.add('hidden');
-    } finally { startBtn.disabled = false; }
-});
-document.getElementById('submitBtn').addEventListener('click', async () => {
-    const answer = document.getElementById('answerText').value.trim();
-    if (!answer) return;
-    const res = await fetch('/interview', { method: 'POST', headers: csrfHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify({
-        action: 'evaluate', question: currentQuestion, answer,
-        role: document.getElementById('targetRole').value, mode: document.getElementById('interviewMode').value
-    })});
-    const data = await res.json();
-    if (!res.ok) { showToast(data.error || 'Failed', 'error'); return; }
-    document.getElementById('scoreValue').textContent = data.score;
-    document.getElementById('feedbackText').textContent = data.feedback;
-    document.getElementById('idealText').textContent = data.ideal_answer_points;
-    document.getElementById('feedbackPanel').classList.remove('hidden');
-    document.getElementById('interviewPanel').classList.add('hidden');
-    showToast('Answer evaluated', 'success');
-});
-document.getElementById('nextQuestionBtn').addEventListener('click', () => startBtn.click());
-document.getElementById('starBtn').addEventListener('click', async () => {
-    const res = await fetch('/interview', { method: 'POST', headers: csrfHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify({
-        action: 'star', situation: document.getElementById('starSituation').value,
-        task: document.getElementById('starTask').value, action_text: document.getElementById('starAction').value,
-        result: document.getElementById('starResult').value
-    })});
-    const data = await res.json();
-    const out = document.getElementById('starOutput');
-    out.textContent = data.formatted_answer || '';
-    out.classList.remove('hidden');
-});
+        const out = document.getElementById('starOutput');
+        const outContainer = document.getElementById('starOutputContainer');
+        out.textContent = data.formatted_answer || '';
+        outContainer.classList.remove('hidden');
+    });
+
+    document.querySelectorAll('.history-item').forEach(item => {
+        item.addEventListener('click', () => {
+            document.getElementById('prevQuestion').textContent = item.dataset.question;
+            document.getElementById('prevAnswer').textContent = item.dataset.answer;
+            document.getElementById('prevScore').textContent = item.dataset.score + '/10';
+            document.getElementById('prevFeedback').textContent = item.dataset.feedback;
+            document.getElementById('previousPanel').classList.remove('hidden');
+            document.getElementById('previousPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    });
 </script>
 {% endblock %}

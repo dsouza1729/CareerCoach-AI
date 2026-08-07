@@ -9,8 +9,30 @@ from guardrails import (
     sanitize_ai_output,
     validate_message,
 )
-from resume_parser import get_latest_resume_text
+from resume_parser import get_latest_resume_text, parse_resume_safe
+from security import read_validated_resume
 from usage import enforce_ai_rate_limit, log_ai_usage
+from werkzeug.utils import secure_filename
+import re
+import requests
+
+def fetch_url_text(url):
+    try:
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        # Simple HTML tag stripping
+        text = re.sub(r'<[^>]+>', ' ', response.text)
+        return re.sub(r'\s+', ' ', text).strip()
+    except Exception as e:
+        return f"__FETCH_ERROR__ {e}"
+        
+def resolve_job_description(jd_text):
+    if jd_text.startswith("http://") or jd_text.startswith("https://"):
+        return fetch_url_text(jd_text)
+    return jd_text
 
 tools_bp = Blueprint("ai_tools", __name__)
 
@@ -25,9 +47,27 @@ def job_match():
         rate_limit_response = enforce_ai_rate_limit()
         if rate_limit_response:
             return rate_limit_response
-        data = request.get_json(silent=True) or {}
-        job_description = (data.get("job_description") or "").strip()
-        resume_text = (data.get("resume_text") or "").strip() or get_latest_resume_text(user_id)
+        if request.is_json:
+            data = request.get_json(silent=True) or {}
+        else:
+            data = request.form
+
+        job_description = resolve_job_description((data.get("job_description") or "").strip())
+        if job_description.startswith("__FETCH_ERROR__"):
+            return jsonify({"error": f"Could not read the link ({job_description[16:]}). Please paste the text manually."}), 400
+            
+        resume_text = ""
+        if "file" in request.files and request.files["file"].filename:
+            file_bytes, file_error = read_validated_resume(request.files["file"])
+            if file_error:
+                return jsonify({"error": file_error}), 400
+            filename = secure_filename(request.files["file"].filename)
+            resume_text, parse_error = parse_resume_safe(file_bytes, filename)
+            if parse_error:
+                return jsonify({"error": parse_error}), 400
+        else:
+            resume_text = (data.get("resume_text") or "").strip() or get_latest_resume_text(user_id)
+
         if not job_description or not resume_text:
             return jsonify({"error": "Job description and resume text are required."}), 400
         result = ai_service.match_job_description(resume_text, job_description)
@@ -46,9 +86,27 @@ def cover_letter():
         rate_limit_response = enforce_ai_rate_limit()
         if rate_limit_response:
             return rate_limit_response
-        data = request.get_json(silent=True) or {}
-        job_description = (data.get("job_description") or "").strip()
-        resume_text = (data.get("resume_text") or "").strip() or get_latest_resume_text(user_id)
+        if request.is_json:
+            data = request.get_json(silent=True) or {}
+        else:
+            data = request.form
+
+        job_description = resolve_job_description((data.get("job_description") or "").strip())
+        if job_description.startswith("__FETCH_ERROR__"):
+            return jsonify({"error": f"Could not read the link ({job_description[16:]}). Please paste the text manually."}), 400
+        
+        resume_text = ""
+        if "file" in request.files and request.files["file"].filename:
+            file_bytes, file_error = read_validated_resume(request.files["file"])
+            if file_error:
+                return jsonify({"error": file_error}), 400
+            filename = secure_filename(request.files["file"].filename)
+            resume_text, parse_error = parse_resume_safe(file_bytes, filename)
+            if parse_error:
+                return jsonify({"error": parse_error}), 400
+        else:
+            resume_text = (data.get("resume_text") or "").strip() or get_latest_resume_text(user_id)
+
         if not job_description or not resume_text:
             return jsonify({"error": "Job description and resume are required."}), 400
         letter = sanitize_ai_output(
@@ -70,9 +128,25 @@ def linkedin():
         rate_limit_response = enforce_ai_rate_limit()
         if rate_limit_response:
             return rate_limit_response
-        data = request.get_json(silent=True) or {}
-        resume_text = (data.get("resume_text") or "").strip() or get_latest_resume_text(user_id)
+        if request.is_json:
+            data = request.get_json(silent=True) or {}
+        else:
+            data = request.form
+
         target_role = (data.get("target_role") or profile.get("target_role") or "").strip()
+        
+        resume_text = ""
+        if "file" in request.files and request.files["file"].filename:
+            file_bytes, file_error = read_validated_resume(request.files["file"])
+            if file_error:
+                return jsonify({"error": file_error}), 400
+            filename = secure_filename(request.files["file"].filename)
+            resume_text, parse_error = parse_resume_safe(file_bytes, filename)
+            if parse_error:
+                return jsonify({"error": parse_error}), 400
+        else:
+            resume_text = (data.get("resume_text") or "").strip() or get_latest_resume_text(user_id)
+
         if not resume_text:
             return jsonify({"error": "Upload a resume first or paste resume text."}), 400
         summary = sanitize_ai_output(
@@ -206,7 +280,21 @@ def interview():
 
     with get_db() as conn:
         history = conn.execute(
-            "SELECT * FROM interview_history WHERE user_id = ? ORDER BY created_at DESC LIMIT 10",
+            "SELECT * FROM interview_history WHERE user_id = ? ORDER BY created_at DESC LIMIT 5",
             (user_id,),
         ).fetchall()
     return render_template("interview.html", history=history)
+
+
+@tools_bp.route("/interview/history", methods=["GET"], endpoint="interview_history")
+def interview_history():
+    guard = require_login()
+    if guard:
+        return guard
+    user_id = session["user_id"]
+    with get_db() as conn:
+        history = conn.execute(
+            "SELECT * FROM interview_history WHERE user_id = ? ORDER BY created_at DESC",
+            (user_id,),
+        ).fetchall()
+    return render_template("interview_history.html", history=history)

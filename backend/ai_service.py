@@ -1,5 +1,6 @@
-import os
 import json
+import os
+
 import requests
 from dotenv import load_dotenv
 
@@ -135,6 +136,22 @@ def resolve_experience_level(profile_value=None):
     if not profile_value:
         return "2-4 years"
     normalized = str(profile_value).strip().lower()
+    
+    import re
+    match = re.search(r"(\d+)\s*year", normalized)
+    if match:
+        y = int(match.group(1))
+        if y <= 1:
+            return "0-1 years"
+        elif y <= 4:
+            return "2-4 years"
+        elif y <= 9:
+            return "5-9 years"
+        elif y <= 14:
+            return "10-14 years"
+        else:
+            return "15+ years"
+
     aliases = {
         "0-1": "0-1 years",
         "0-1 years": "0-1 years",

@@ -1,8 +1,9 @@
 from io import BytesIO
 from unittest.mock import MagicMock, patch
 
-from security import read_validated_resume
 from werkzeug.datastructures import FileStorage
+
+from security import read_validated_resume
 
 
 def test_read_validated_resume_accepts_valid_header():

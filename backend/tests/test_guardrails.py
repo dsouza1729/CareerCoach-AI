@@ -1,9 +1,9 @@
 from guardrails import (
+    BLOCKED_TOPIC_RESPONSE,
+    contains_blocked_keyword,
     sanitize_ai_output,
     sanitize_chat_output,
     validate_message,
-    contains_blocked_keyword,
-    BLOCKED_TOPIC_RESPONSE,
 )
 
 

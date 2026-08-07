@@ -1,17 +1,16 @@
 import os
 
-import docx
-import pypdf
 from flask import Flask, session
+from werkzeug.middleware.proxy_fix import ProxyFix
 
-import ai_service
 from auth import get_profile
 from config import is_debug_mode, load_secret_key, session_lifetime
-from database import DB_PATH, init_db
+from database import init_db
 from routes import register_routes
-from security import AI_RATE_LIMIT, AI_RATE_WINDOW_SECONDS, csrf
+from security import csrf
 
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 app.secret_key = load_secret_key()
 csrf.init_app(app)
 

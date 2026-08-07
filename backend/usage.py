@@ -17,7 +17,7 @@ def get_ai_usage_count(user_id):
     window = security.ai_usage_window_sql_modifier()
     with get_db() as conn:
         return conn.execute(
-            f"SELECT COUNT(*) as c FROM ai_usage WHERE user_id = ? AND created_at > datetime('now', ?)",
+            "SELECT COUNT(*) as c FROM ai_usage WHERE user_id = ? AND created_at > datetime('now', ?)",
             (user_id, window),
         ).fetchone()["c"]
 

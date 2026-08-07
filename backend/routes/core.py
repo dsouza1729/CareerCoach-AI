@@ -1,8 +1,8 @@
 from flask import Blueprint, jsonify, render_template, request, session
 
+import security
 from auth import get_profile, require_login
 from database import get_db
-import security
 from usage import ai_rate_window_label, get_ai_usage_count
 
 core_bp = Blueprint("core", __name__)
@@ -13,11 +13,6 @@ def index():
     return render_template("index.html")
 
 
-@core_bp.route("/features", endpoint="features")
-def features():
-    return render_template("features.html")
-
-
 @core_bp.route("/onboarding", methods=["GET", "POST"], endpoint="onboarding")
 def onboarding():
     guard = require_login()
@@ -26,23 +21,39 @@ def onboarding():
     user_id = session["user_id"]
     if request.method == "POST":
         data = request.get_json(silent=True) or {}
+        update_fields = [
+            "full_name=excluded.full_name",
+            "target_role=excluded.target_role",
+            "industry=excluded.industry",
+            "years_experience=excluded.years_experience",
+            "tone=excluded.tone",
+            "onboarding_done=1"
+        ]
+        
+        insert_cols = ["user_id", "full_name", "target_role", "industry", "years_experience", "tone", "onboarding_done"]
+        insert_vals = ["?", "?", "?", "?", "?", "?", "1"]
+        params = [
+            user_id,
+            (data.get("full_name") or "").strip(),
+            (data.get("target_role") or "").strip(),
+            (data.get("industry") or "").strip(),
+            (data.get("years_experience") or "").strip(),
+            data.get("tone") or "balanced"
+        ]
+
+        if "profile_picture" in data:
+            insert_cols.append("profile_picture")
+            insert_vals.append("?")
+            update_fields.append("profile_picture=excluded.profile_picture")
+            params.append(data.get("profile_picture"))
+
+        query = f"""INSERT INTO profiles ({', '.join(insert_cols)})
+                    VALUES ({', '.join(insert_vals)})
+                    ON CONFLICT(user_id) DO UPDATE SET
+                    {', '.join(update_fields)}"""
+
         with get_db() as conn:
-            conn.execute(
-                """INSERT INTO profiles (user_id, full_name, target_role, industry, years_experience, tone, onboarding_done)
-                   VALUES (?, ?, ?, ?, ?, ?, 1)
-                   ON CONFLICT(user_id) DO UPDATE SET
-                   full_name=excluded.full_name, target_role=excluded.target_role,
-                   industry=excluded.industry, years_experience=excluded.years_experience,
-                   tone=excluded.tone, onboarding_done=1""",
-                (
-                    user_id,
-                    (data.get("full_name") or "").strip(),
-                    (data.get("target_role") or "").strip(),
-                    (data.get("industry") or "").strip(),
-                    (data.get("years_experience") or "").strip(),
-                    data.get("tone") or "balanced",
-                ),
-            )
+            conn.execute(query, tuple(params))
             conn.commit()
         return jsonify({"status": "success", "redirect": "/dashboard"})
     return render_template("onboarding.html")
@@ -56,23 +67,38 @@ def profile():
     user_id = session["user_id"]
     if request.method == "POST":
         data = request.get_json(silent=True) or {}
+        update_fields = [
+            "full_name=excluded.full_name",
+            "target_role=excluded.target_role",
+            "industry=excluded.industry",
+            "years_experience=excluded.years_experience",
+            "tone=excluded.tone"
+        ]
+        
+        insert_cols = ["user_id", "full_name", "target_role", "industry", "years_experience", "tone", "onboarding_done"]
+        insert_vals = ["?", "?", "?", "?", "?", "?", "1"]
+        params = [
+            user_id,
+            (data.get("full_name") or "").strip(),
+            (data.get("target_role") or "").strip(),
+            (data.get("industry") or "").strip(),
+            (data.get("years_experience") or "").strip(),
+            data.get("tone") or "balanced"
+        ]
+
+        if "profile_picture" in data:
+            insert_cols.append("profile_picture")
+            insert_vals.append("?")
+            update_fields.append("profile_picture=excluded.profile_picture")
+            params.append(data.get("profile_picture"))
+
+        query = f"""INSERT INTO profiles ({', '.join(insert_cols)})
+                    VALUES ({', '.join(insert_vals)})
+                    ON CONFLICT(user_id) DO UPDATE SET
+                    {', '.join(update_fields)}"""
+
         with get_db() as conn:
-            conn.execute(
-                """INSERT INTO profiles (user_id, full_name, target_role, industry, years_experience, tone, onboarding_done)
-                   VALUES (?, ?, ?, ?, ?, ?, 1)
-                   ON CONFLICT(user_id) DO UPDATE SET
-                   full_name=excluded.full_name, target_role=excluded.target_role,
-                   industry=excluded.industry, years_experience=excluded.years_experience,
-                   tone=excluded.tone""",
-                (
-                    user_id,
-                    (data.get("full_name") or "").strip(),
-                    (data.get("target_role") or "").strip(),
-                    (data.get("industry") or "").strip(),
-                    (data.get("years_experience") or "").strip(),
-                    data.get("tone") or "balanced",
-                ),
-            )
+            conn.execute(query, tuple(params))
             conn.commit()
         return jsonify({"status": "success"})
     return render_template("profile.html", profile=get_profile(user_id))

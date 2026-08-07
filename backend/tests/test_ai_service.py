@@ -1,9 +1,9 @@
 from ai_service import (
-    parse_json_response,
-    normalize_resume_analysis,
-    normalize_interview_feedback,
-    normalize_salary_advice,
     format_salary_amount,
+    normalize_interview_feedback,
+    normalize_resume_analysis,
+    normalize_salary_advice,
+    parse_json_response,
     resolve_experience_level,
     resolve_location_value,
 )

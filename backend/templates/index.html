@@ -2,64 +2,161 @@
 
 {% block content %}
 <div class="relative bg-white dark:bg-gray-900 overflow-hidden transition-colors">
-    <div class="max-w-7xl mx-auto">
-        <div class="relative z-10 pb-8 bg-white dark:bg-gray-900 sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32 pt-16 lg:pt-24">
-            <main class="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
-                <div class="sm:text-center lg:text-left">
-                    <p class="inline-flex items-center rounded-full bg-brand-50 dark:bg-brand-900/30 px-3 py-1 text-sm font-medium text-brand-700 dark:text-brand-300 ring-1 ring-inset ring-brand-600/20 dark:ring-brand-500/30 mb-4">
-                        AI-powered career coaching
-                    </p>
-                    <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white sm:text-5xl md:text-6xl">
-                        <span class="block xl:inline">Accelerate your career</span>
-                        <span class="block text-brand-600 dark:text-brand-400 xl:inline">with AI coaching</span>
-                    </h1>
-                    <p class="mt-3 text-base text-gray-500 dark:text-gray-400 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                        Get personalized career guidance, resume analysis, and interview preparation powered by advanced AI. Discover your true potential today.
-                    </p>
-                    <div class="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
-                        <div class="rounded-md shadow dark:shadow-brand-900/20">
-                            <a href="/signup" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-brand-600 hover:bg-brand-700 dark:bg-brand-500 dark:hover:bg-brand-600 md:py-4 md:text-lg md:px-10 transition-colors">
-                                Get started
-                            </a>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 lg:pt-24 pb-16 lg:pb-24">
+        <div class="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+            <!-- Left Side Content -->
+            <div class="relative z-10 sm:text-center lg:text-left">
+                <div class="inline-flex items-center rounded-full bg-indigo-50/50 dark:bg-indigo-900/30 px-4 py-1.5 text-sm font-medium text-brand-600 dark:text-brand-300 ring-1 ring-inset ring-brand-500/20 backdrop-blur-sm mb-6 shadow-sm">
+                    <span class="flex h-2 w-2 rounded-full bg-brand-500 mr-2 animate-pulse"></span> AI-powered career coaching
+                </div>
+                <h1 class="text-5xl tracking-tight font-extrabold sm:text-6xl md:text-7xl">
+                    <span class="block text-gray-900 dark:text-white drop-shadow-sm">Accelerate your</span>
+                    <span class="block text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-purple-600 dark:from-brand-400 dark:to-purple-400 pb-2">career with AI</span>
+                </h1>
+                <p class="mt-4 text-base text-gray-500 dark:text-gray-400 sm:mt-6 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-6 md:text-xl lg:mx-0 leading-relaxed">
+                    Get personalized career guidance, resume analysis, and interview preparation powered by advanced AI. Discover your true potential today.
+                </p>
+                <div class="mt-8 sm:mt-10 sm:flex sm:justify-center lg:justify-start gap-4">
+                    <div class="w-full sm:w-auto">
+                        <a href="/signup" class="w-full flex items-center justify-center px-8 py-3.5 text-base font-bold uppercase tracking-wider rounded-xl text-white bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 md:py-4 md:text-lg md:px-10 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-brand-500/30 active:scale-95 group gap-2">
+                            <span>Get Started Free</span>
+                            <svg class="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </a>
+                    </div>
+                    <div class="mt-3 sm:mt-0 w-full sm:w-auto">
+                        <a href="/login" class="w-full flex items-center justify-center px-8 py-3.5 text-base font-bold uppercase tracking-wider rounded-xl text-gray-700 dark:text-gray-200 bg-white/50 dark:bg-gray-800/50 backdrop-blur-md hover:bg-white dark:hover:bg-gray-800 md:py-4 md:text-lg md:px-10 transition-all duration-300 ring-1 ring-inset ring-gray-200 dark:ring-gray-700 shadow-sm hover:shadow-md active:scale-95">
+                            Sign In
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side Image -->
+            <div class="relative w-full max-w-lg mx-auto lg:max-w-none">
+                <!-- Decorative blur blobs behind the image -->
+                <div class="absolute -top-10 -right-10 w-72 h-72 bg-purple-300/30 dark:bg-purple-600/20 rounded-full blur-3xl"></div>
+                <div class="absolute -bottom-10 -left-10 w-72 h-72 bg-brand-300/30 dark:bg-brand-600/20 rounded-full blur-3xl"></div>
+                
+                <!-- Image with glassmorphic container -->
+                <div class="relative bg-white/20 dark:bg-gray-800/20 p-2 rounded-[2rem] backdrop-blur-sm ring-1 ring-white/50 dark:ring-white/10 shadow-2xl">
+                    <img src="{{ url_for('static', filename='hero.png') }}" alt="AI Career Coach Illustration" class="rounded-3xl w-full h-auto object-cover shadow-inner transform transition hover:scale-[1.02] duration-500 ease-out">
+                    
+                    <!-- Floating element -->
+                    <div class="absolute -left-6 bottom-12 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-4 rounded-2xl shadow-xl ring-1 ring-black/5 dark:ring-white/10 flex items-center gap-4 animate-bounce" style="animation-duration: 3s;">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                         </div>
-                        <div class="mt-3 sm:mt-0 sm:ml-3">
-                            <a href="/features" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-brand-700 dark:text-brand-300 bg-brand-100 dark:bg-brand-900/40 hover:bg-brand-200 dark:hover:bg-brand-900/60 md:py-4 md:text-lg md:px-10 transition-colors ring-1 ring-brand-600/10 dark:ring-brand-500/20">
-                                View features
-                            </a>
+                        <div>
+                            <p class="text-sm font-bold text-gray-900 dark:text-white">+40%</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Interview Success</p>
                         </div>
                     </div>
                 </div>
-            </main>
+            </div>
         </div>
     </div>
-    <div class="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
-        <div class="hero-logo-panel h-56 w-full sm:h-72 md:h-96 lg:w-full lg:h-full bg-gradient-to-br from-brand-100 to-brand-50 dark:from-gray-800 dark:to-gray-900 dark:via-brand-950 flex items-center justify-center relative overflow-hidden">
-            <div class="absolute inset-0 dark:opacity-40" aria-hidden="true">
-                <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-brand-400/20 dark:bg-brand-500/10 rounded-full blur-3xl"></div>
-                <div class="absolute bottom-1/4 right-1/4 w-48 h-48 bg-brand-300/30 dark:bg-brand-600/10 rounded-full blur-2xl"></div>
+</div>
+
+<!-- Features Showcase Section -->
+<div class="bg-gray-50/50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 transition-colors py-24 overflow-hidden relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">Everything you need to land the job</h2>
+            <p class="mt-4 text-lg text-gray-500 dark:text-gray-400">Our AI tools give you a competitive edge at every stage of the hiring process.</p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-16 items-center mb-24">
+            <div class="order-2 lg:order-1">
+                <div class="inline-flex items-center rounded-full bg-purple-50 dark:bg-purple-900/30 px-3 py-1 text-sm font-medium text-purple-700 dark:text-purple-300 ring-1 ring-inset ring-purple-600/20 mb-6">
+                    Resume Optimizer
+                </div>
+                <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Beat the ATS with smart resume analysis</h3>
+                <p class="text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">Upload your resume and our AI will extract your skills, score your formatting, and tell you exactly what you need to change to get past automated resume screeners.</p>
+                <ul class="space-y-4">
+                    <li class="flex items-center text-gray-700 dark:text-gray-300"><span class="flex items-center justify-center w-6 h-6 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 mr-3">✓</span> Instant ATS compatibility score</li>
+                    <li class="flex items-center text-gray-700 dark:text-gray-300"><span class="flex items-center justify-center w-6 h-6 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 mr-3">✓</span> Automatic skill gap detection</li>
+                    <li class="flex items-center text-gray-700 dark:text-gray-300"><span class="flex items-center justify-center w-6 h-6 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 mr-3">✓</span> Actionable rewriting suggestions</li>
+                </ul>
             </div>
-            <svg class="hero-logo relative h-56 w-56 sm:h-64 sm:w-64 drop-shadow-lg dark:drop-shadow-brand-900/50" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="AI logo">
-                <circle class="logo-glow-outer" cx="120" cy="120" r="108" fill="#dcfce7" opacity="0.55"/>
-                <circle class="logo-glow-inner" cx="120" cy="120" r="88" fill="#bbf7d0" opacity="0.35"/>
-                <rect x="52" y="52" width="136" height="136" rx="36" fill="url(#aiLogoGradient)"/>
-                <rect x="52" y="52" width="136" height="136" rx="36" stroke="#15803d" stroke-width="2" opacity="0.15" class="logo-border"/>
-                <circle cx="120" cy="88" r="7" fill="white" opacity="0.95"/>
-                <circle class="logo-node" cx="88" cy="128" r="5.5" fill="#dcfce7"/>
-                <circle class="logo-node" cx="152" cy="128" r="5.5" fill="#dcfce7"/>
-                <circle class="logo-node" cx="120" cy="152" r="4.5" fill="#dcfce7"/>
-                <line x1="120" y1="95" x2="92" y2="123" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
-                <line x1="120" y1="95" x2="148" y2="123" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
-                <line x1="120" y1="95" x2="120" y2="147" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
-                <text x="120" y="138" text-anchor="middle" fill="white" font-family="Inter, system-ui, sans-serif" font-size="52" font-weight="800" letter-spacing="-1">AI</text>
-                <path d="M178 48 L181 58 L191 61 L181 64 L178 74 L175 64 L165 61 L175 58 Z" fill="#4ade80" class="logo-sparkle"/>
-                <path d="M58 168 L60 174 L66 176 L60 178 L58 184 L56 178 L50 176 L56 174 Z" fill="#86efac" opacity="0.8" class="logo-sparkle"/>
-                <defs>
-                    <linearGradient id="aiLogoGradient" x1="52" y1="52" x2="188" y2="188" gradientUnits="userSpaceOnUse">
-                        <stop stop-color="#22c55e"/>
-                        <stop offset="1" stop-color="#16a34a"/>
-                    </linearGradient>
-                </defs>
-            </svg>
+            <div class="order-1 lg:order-2 relative group">
+                <div class="absolute inset-0 bg-gradient-to-tr from-purple-400/20 to-brand-400/20 rounded-3xl blur-2xl transform group-hover:scale-105 transition-transform duration-500"></div>
+                <div class="relative bg-white/50 dark:bg-gray-800/50 p-2 rounded-[2rem] ring-1 ring-gray-900/5 dark:ring-white/10 shadow-xl backdrop-blur-sm">
+                    <img src="{{ url_for('static', filename='resume.png') }}" alt="Resume Analysis UI" class="rounded-3xl w-full shadow-inner object-cover">
+                </div>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+            <div class="relative group">
+                <div class="absolute inset-0 bg-gradient-to-tr from-brand-400/20 to-blue-400/20 rounded-3xl blur-2xl transform group-hover:scale-105 transition-transform duration-500"></div>
+                <div class="relative bg-white/50 dark:bg-gray-800/50 p-2 rounded-[2rem] ring-1 ring-gray-900/5 dark:ring-white/10 shadow-xl backdrop-blur-sm">
+                    <img src="{{ url_for('static', filename='interview.png') }}" alt="Mock Interview UI" class="rounded-3xl w-full shadow-inner object-cover">
+                </div>
+            </div>
+            <div>
+                <div class="inline-flex items-center rounded-full bg-blue-50 dark:bg-blue-900/30 px-3 py-1 text-sm font-medium text-blue-700 dark:text-blue-300 ring-1 ring-inset ring-blue-600/20 mb-6">
+                    Mock Interviews
+                </div>
+                <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Practice with an AI coach that talks back</h3>
+                <p class="text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">Don't freeze up in the real interview. Practice behavioral and technical questions customized to your exact target role and get instant grading and feedback.</p>
+                <ul class="space-y-4">
+                    <li class="flex items-center text-gray-700 dark:text-gray-300"><span class="flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 mr-3">✓</span> Role-specific custom questions</li>
+                    <li class="flex items-center text-gray-700 dark:text-gray-300"><span class="flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 mr-3">✓</span> Answer grading (1-10 scale)</li>
+                    <li class="flex items-center text-gray-700 dark:text-gray-300"><span class="flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 mr-3">✓</span> Ideal answer examples</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- All Features Grid -->
+<div id="all-features" class="bg-white dark:bg-gray-900 py-24 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">More tools to boost your career</h2>
+            <p class="mt-4 text-lg text-gray-500 dark:text-gray-400">Explore the complete suite of AI career coaching features.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div class="group bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl rounded-[2rem] ring-1 ring-gray-900/5 dark:ring-white/10 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
+                <div class="relative w-full h-48 bg-gray-100 dark:bg-gray-900 overflow-hidden">
+                    <img src="{{ url_for('static', filename='chat.png') }}" alt="AI Chat Coach" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+                </div>
+                <div class="p-8 flex-1">
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">AI Chat Coach</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-lg">Chat with a warm mentor for personalized advice on career transitions, salary negotiation, and skill development.</p>
+                </div>
+            </div>
+
+            <div class="group bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl rounded-[2rem] ring-1 ring-gray-900/5 dark:ring-white/10 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
+                <div class="relative w-full h-48 bg-gray-100 dark:bg-gray-900 overflow-hidden">
+                    <img src="{{ url_for('static', filename='cover_letter.png') }}" alt="Cover Letter Generator" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+                </div>
+                <div class="p-8 flex-1">
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">Cover Letter Generator</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-lg">Generate professional, enthusiastic, or concise cover letters tailored perfectly to any job description.</p>
+                </div>
+            </div>
+
+            <div class="group bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl rounded-[2rem] ring-1 ring-gray-900/5 dark:ring-white/10 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
+                <div class="relative w-full h-48 bg-gray-100 dark:bg-gray-900 overflow-hidden">
+                    <img src="{{ url_for('static', filename='salary.png') }}" alt="Salary Advisor" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+                </div>
+                <div class="p-8 flex-1">
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">Salary Advisor</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-lg">Get estimated salary ranges, negotiation talking points, and customized scripts based on your experience.</p>
+                </div>
+            </div>
+
+            <div class="group bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl rounded-[2rem] ring-1 ring-gray-900/5 dark:ring-white/10 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
+                <div class="relative w-full h-48 bg-gray-100 dark:bg-gray-900 overflow-hidden">
+                    <img src="{{ url_for('static', filename='assessment.png') }}" alt="Career Assessment" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+                </div>
+                <div class="p-8 flex-1">
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">Career Assessment</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-lg">AI-powered strengths analysis, growth areas, and recommended next steps directly from your profile data.</p>
+                </div>
+            </div>
         </div>
     </div>
 </div>

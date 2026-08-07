@@ -1,8 +1,16 @@
 import secrets
 import sqlite3
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
-from flask import Blueprint, jsonify, redirect, render_template, request, session, url_for
+from flask import (
+    Blueprint,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 
 import email_service
 from auth import (
@@ -14,7 +22,6 @@ from auth import (
     is_valid_password,
     login_user,
     normalize_email,
-    require_login,
 )
 from config import MIN_PASSWORD_LENGTH, is_debug_mode
 from database import get_db
@@ -81,7 +88,7 @@ def forgot_password():
             if not user:
                 return jsonify(payload)
             token = secrets.token_urlsafe(32)
-            expires = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=1)
+            expires = datetime.now(UTC).replace(tzinfo=None) + timedelta(hours=1)
             conn.execute("DELETE FROM password_resets WHERE email = ?", (email,))
             conn.execute(
                 "INSERT INTO password_resets (email, token, expires_at) VALUES (?, ?, ?)",
@@ -101,7 +108,7 @@ def reset_password(token):
         row = conn.execute(
             "SELECT email, expires_at FROM password_resets WHERE token = ?", (token,)
         ).fetchone()
-    if not row or datetime.fromisoformat(row["expires_at"]) < datetime.now(timezone.utc).replace(tzinfo=None):
+    if not row or datetime.fromisoformat(row["expires_at"]) < datetime.now(UTC).replace(tzinfo=None):
         return render_template("reset_password.html", error="Invalid or expired reset link.", token=None)
     if request.method == "POST":
         data = request.get_json(silent=True) or {}

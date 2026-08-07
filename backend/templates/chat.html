@@ -1,74 +1,148 @@
 {% extends "base.html" %}
 {% block title %}AI Career Coach{% endblock %}
 {% block content %}
-<div class="max-w-4xl mx-auto mt-8 px-4 sm:px-6 lg:px-8 flex flex-col h-[calc(100vh-8rem)]">
-    <div class="bg-white dark:bg-gray-800 px-6 py-4 border-b border-gray-200 dark:border-gray-700 rounded-t-lg shadow-sm flex items-center justify-between">
-        <div>
-            <h2 class="text-lg font-medium text-gray-900 dark:text-white">Your AI Career Coach</h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-                {% if profile.full_name %}Hi {{ profile.full_name }} — {% endif %}Ask about careers, resumes, or interviews.
-            </p>
+<style>
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    
+    /* Markdown Styling overrides */
+    .prose-brand a { color: #4f46e5; text-decoration: none; font-weight: 600; }
+    .prose-brand a:hover { text-decoration: underline; }
+    .prose-brand strong { color: inherit; font-weight: 700; }
+    .prose-brand p { margin-top: 0.5em; margin-bottom: 0.5em; }
+    .prose-brand ul, .prose-brand ol { margin-top: 0.5em; margin-bottom: 0.5em; padding-left: 1.25em; }
+    .prose-brand li { margin-top: 0.25em; margin-bottom: 0.25em; }
+</style>
+
+<div class="max-w-4xl mx-auto mt-2 sm:mt-4 mb-2 sm:mb-8 px-2 sm:px-6 lg:px-8 flex flex-col h-[calc(100dvh-6rem)] sm:h-[calc(100dvh-9rem)]">
+    
+    <!-- Glassmorphic Header -->
+    <div class="relative z-20 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl px-4 py-3 sm:px-6 sm:py-4 border border-gray-200/60 dark:border-gray-700/60 rounded-t-xl sm:rounded-t-2xl shadow-sm flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center shadow-md">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+            </div>
+            <div>
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    Your AI Coach
+                    <span class="relative flex h-2.5 w-2.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span></span>
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {% if profile.full_name %}Hi {{ profile.full_name }} — {% endif %}Ask about careers or resumes.
+                </p>
+            </div>
         </div>
-        <div class="flex items-center gap-3">
-            <span id="usageBadge" class="text-xs text-gray-500 dark:text-gray-400 hidden"></span>
-            <button type="button" id="clearChatBtn" class="text-xs text-gray-500 hover:text-red-600">Clear chat</button>
-            <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-brand-500"></span></span>
+        <div class="flex items-center gap-4">
+            <span id="usageBadge" class="text-xs font-medium px-2.5 py-1 bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 rounded-full border border-brand-100 dark:border-brand-800 hidden"></span>
+            <button type="button" id="clearChatBtn" class="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-full transition-colors group" title="Clear chat history">
+                <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            </button>
         </div>
     </div>
-    <div id="chat-messages" class="flex-grow bg-gray-50 dark:bg-gray-900/50 p-6 overflow-y-auto border-x border-gray-200 dark:border-gray-700 shadow-inner space-y-4">
+    
+    <!-- Messages Area -->
+    <div id="chat-messages" class="flex-grow bg-gray-50/30 dark:bg-gray-900/20 p-3 sm:p-6 overflow-y-auto border-x border-gray-200/60 dark:border-gray-700/60 space-y-4 sm:space-y-6 relative custom-scrollbar scroll-smooth">
+        
+        <!-- Subtle background glowing blobs -->
+        <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+            <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-400/5 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-400/5 rounded-full blur-3xl"></div>
+        </div>
+
         {% if history|length == 0 %}
-        <div class="flex items-start">
-            <div class="flex-shrink-0 bg-brand-100 dark:bg-brand-900 rounded-full p-2"><svg class="h-6 w-6 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div>
-            <div class="ml-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl rounded-tl-none px-4 py-3 shadow-sm max-w-[85%]">
-                <p class="text-gray-800 dark:text-gray-200 text-sm leading-relaxed whitespace-pre-wrap">Hello! I am your AI Career Coach. How can I help you accelerate your career today?</p>
+        <div class="flex items-start gap-4 relative z-10 animate-fade-in-up">
+            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-brand-100 to-indigo-100 dark:from-brand-900 dark:to-indigo-900 flex items-center justify-center shadow-sm border border-brand-200 dark:border-brand-800">
+                <svg class="h-5 w-5 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+            </div>
+            <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-2xl rounded-tl-sm px-4 py-3 sm:px-5 sm:py-4 shadow-sm max-w-[90%] sm:max-w-[85%] text-gray-800 dark:text-gray-200 text-sm leading-relaxed">
+                Hello! I am your AI Career Coach. How can I help you accelerate your career today?
             </div>
         </div>
         {% endif %}
+        
         {% for msg in history %}
             {% if msg.role == 'ai' %}
-            <div class="flex items-start">
-                <div class="flex-shrink-0 bg-brand-100 dark:bg-brand-900 rounded-full p-2"><svg class="h-6 w-6 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div>
-                <div class="ml-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl rounded-tl-none px-4 py-3 shadow-sm max-w-[85%]">
-                    <p class="text-gray-800 dark:text-gray-200 text-sm leading-relaxed whitespace-pre-wrap">{{ msg.content }}</p>
+            <div class="flex items-start gap-4 relative z-10 animate-fade-in-up">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-brand-100 to-indigo-100 dark:from-brand-900 dark:to-indigo-900 flex items-center justify-center shadow-sm border border-brand-200 dark:border-brand-800">
+                    <svg class="h-5 w-5 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                 </div>
+                <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-2xl rounded-tl-sm px-4 py-3 sm:px-5 sm:py-4 shadow-sm max-w-[90%] sm:max-w-[85%] text-gray-800 dark:text-gray-200 text-sm leading-relaxed prose-brand ai-message-content whitespace-pre-wrap">{{ msg.content }}</div>
             </div>
             {% else %}
-            <div class="flex items-start justify-end">
-                <div class="mr-3 bg-brand-600 rounded-2xl rounded-tr-none px-4 py-3 shadow-sm max-w-[85%]"><p class="text-white text-sm whitespace-pre-wrap">{{ msg.content }}</p></div>
-                <div class="flex-shrink-0 bg-gray-200 dark:bg-gray-700 rounded-full p-2"><svg class="h-6 w-6 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></div>
+            <div class="flex items-start justify-end gap-4 relative z-10 animate-fade-in-up">
+                <div class="bg-gradient-to-br from-brand-600 to-indigo-600 rounded-2xl rounded-tr-sm px-4 py-3 sm:px-5 sm:py-4 shadow-md max-w-[90%] sm:max-w-[85%] text-white text-sm whitespace-pre-wrap">{{ msg.content }}</div>
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center shadow-sm overflow-hidden border border-gray-300 dark:border-gray-600 text-brand-600 dark:text-brand-400 font-bold">
+                    {% if profile.profile_picture %}
+                    <img src="{{ profile.profile_picture }}" class="w-full h-full object-cover">
+                    {% else %}
+                    {{ (profile.full_name or 'U')[0] | upper }}
+                    {% endif %}
+                </div>
             </div>
             {% endif %}
         {% endfor %}
     </div>
-    <div class="bg-white dark:bg-gray-800 px-4 py-4 border-t border-gray-200 dark:border-gray-700 rounded-b-lg shadow-sm">
-        <form id="chatForm" class="flex space-x-3">
-            <input type="text" id="messageInput" autocomplete="off" required class="flex-1 focus:ring-brand-500 focus:border-brand-500 block w-full rounded-md sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-4 py-3" placeholder="Type your message...">
-            <button type="submit" id="sendBtn" class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white bg-brand-600 hover:bg-brand-700">Send</button>
+    
+    <!-- Floating Input Pill Area -->
+    <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl px-2 py-2 sm:px-4 sm:py-4 border border-gray-200/60 dark:border-gray-700/60 rounded-b-xl sm:rounded-b-2xl shadow-sm relative z-20">
+        <form id="chatForm" class="relative flex items-center">
+            <input type="text" id="messageInput" autocomplete="off" required 
+                   class="w-full pl-4 pr-12 py-3 sm:pl-6 sm:pr-14 sm:py-4 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all shadow-inner outline-none text-sm sm:text-base text-gray-900 dark:text-white" 
+                   placeholder="Ask anything about your career...">
+            
+            <button type="submit" id="sendBtn" class="absolute right-2 p-3 bg-gray-900 dark:bg-brand-600 hover:bg-black dark:hover:bg-brand-500 text-white rounded-full transition-colors duration-300 shadow-sm active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed group overflow-hidden">
+                <div class="relative w-5 h-5 flex items-center justify-center">
+                    <!-- Outgoing Airplane -->
+                    <svg class="absolute inset-0 w-5 h-5 transform transition-transform duration-500 ease-out group-hover:translate-x-6 group-hover:-translate-y-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                    </svg>
+                    <!-- Incoming Airplane -->
+                    <svg class="absolute inset-0 w-5 h-5 transform transition-transform duration-500 ease-out -translate-x-6 translate-y-6 group-hover:translate-x-0 group-hover:translate-y-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                    </svg>
+                </div>
+            </button>
         </form>
     </div>
 </div>
 {% endblock %}
+
 {% block scripts %}
 <script>
 const chatMessages = document.getElementById('chat-messages');
 const messageInput = document.getElementById('messageInput');
 const sendBtn = document.getElementById('sendBtn');
+const profilePicture = "{{ profile.profile_picture or '' }}";
+const profileInitial = "{{ (profile.full_name or 'U')[0] | upper }}";
+
+// Render initial markdown
+document.querySelectorAll('.ai-message-content').forEach(el => {
+    // Basic markdown fix to handle whitespace cleanly
+    const rawContent = el.textContent;
+    el.innerHTML = marked.parse(rawContent);
+    el.classList.remove('whitespace-pre-wrap');
+});
 
 function scrollToBottom() { chatMessages.scrollTop = chatMessages.scrollHeight; }
 function escapeHtml(text) {
     return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
+
 function appendAiMessage(text) {
     const aiDiv = document.createElement('div');
-    aiDiv.className = 'flex items-start';
+    aiDiv.className = 'flex items-start gap-4 relative z-10 animate-fade-in-up';
     aiDiv.innerHTML = `
-        <div class="flex-shrink-0 bg-brand-100 dark:bg-brand-900 rounded-full p-2">
-            <svg class="h-6 w-6 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-brand-100 to-indigo-100 dark:from-brand-900 dark:to-indigo-900 flex items-center justify-center shadow-sm border border-brand-200 dark:border-brand-800">
+            <svg class="h-5 w-5 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
         </div>
-        <div class="ml-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl rounded-tl-none px-4 py-3 shadow-sm max-w-[85%]">
-            <p class="text-gray-800 dark:text-gray-200 text-sm leading-relaxed whitespace-pre-wrap"></p>
+        <div class="ai-message-content bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-2xl rounded-tl-sm px-4 py-3 sm:px-5 sm:py-4 shadow-sm max-w-[90%] sm:max-w-[85%] text-gray-800 dark:text-gray-200 text-sm leading-relaxed prose-brand">
         </div>`;
-    aiDiv.querySelector('p').textContent = text;
+    
+    // Parse markdown securely
+    aiDiv.querySelector('.ai-message-content').innerHTML = marked.parse(text);
     chatMessages.appendChild(aiDiv);
 }
 
@@ -96,19 +170,39 @@ document.getElementById('chatForm').addEventListener('submit', async (e) => {
     const text = messageInput.value.trim();
     if (!text) return;
 
+    // Append User Message
     const userDiv = document.createElement('div');
-    userDiv.className = 'flex items-start justify-end';
-    userDiv.innerHTML = `<div class="mr-3 bg-brand-600 rounded-2xl rounded-tr-none px-4 py-3 shadow-sm max-w-[85%]"><p class="text-white text-sm whitespace-pre-wrap">${escapeHtml(text)}</p></div><div class="flex-shrink-0 bg-gray-200 dark:bg-gray-700 rounded-full p-2"><svg class="h-6 w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></div>`;
+    userDiv.className = 'flex items-start justify-end gap-4 relative z-10 animate-fade-in-up';
+    
+    const avatarContent = profilePicture 
+        ? `<img src="${profilePicture}" class="w-full h-full object-cover">` 
+        : profileInitial;
+
+    userDiv.innerHTML = `
+        <div class="bg-gradient-to-br from-brand-600 to-indigo-600 rounded-2xl rounded-tr-sm px-4 py-3 sm:px-5 sm:py-4 shadow-md max-w-[90%] sm:max-w-[85%] text-white text-sm whitespace-pre-wrap">${escapeHtml(text)}</div>
+        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center shadow-sm overflow-hidden border border-gray-300 dark:border-gray-600 text-brand-600 dark:text-brand-400 font-bold">
+            ${avatarContent}
+        </div>`;
     chatMessages.appendChild(userDiv);
+    
     messageInput.value = '';
     messageInput.disabled = true;
     sendBtn.disabled = true;
     scrollToBottom();
 
+    // Append Premium Loading Indicator
     const loadingDiv = document.createElement('div');
     loadingDiv.id = 'loading-indicator';
-    loadingDiv.className = 'flex items-start';
-    loadingDiv.innerHTML = '<div class="flex-shrink-0 bg-brand-100 rounded-full p-2"><svg class="h-6 w-6 text-brand-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div><div class="ml-3 bg-white dark:bg-gray-800 border rounded-2xl rounded-tl-none px-4 py-3"><span class="text-sm text-gray-500">Thinking...</span></div>';
+    loadingDiv.className = 'flex items-start gap-4 relative z-10 animate-fade-in-up';
+    loadingDiv.innerHTML = `
+        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-brand-100 to-indigo-100 dark:from-brand-900 dark:to-indigo-900 flex items-center justify-center shadow-sm border border-brand-200 dark:border-brand-800">
+            <svg class="h-5 w-5 text-brand-600 dark:text-brand-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+        </div>
+        <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-2xl rounded-tl-sm px-6 py-5 shadow-sm flex items-center space-x-2">
+            <div class="w-2 h-2 bg-brand-400 rounded-full animate-bounce" style="animation-delay: 0s"></div>
+            <div class="w-2 h-2 bg-brand-400 rounded-full animate-bounce" style="animation-delay: 0.15s"></div>
+            <div class="w-2 h-2 bg-brand-400 rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
+        </div>`;
     chatMessages.appendChild(loadingDiv);
     scrollToBottom();
 

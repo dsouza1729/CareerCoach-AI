@@ -9,9 +9,15 @@
             <label class="block text-sm font-medium">Target role</label>
             <input type="text" id="target_role" value="{{ profile.target_role or '' }}" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2">
         </div>
-        <div>
+        <div id="resume_file_section">
+            <label class="block text-sm font-medium">Resume Upload (PDF/DOCX/TXT)</label>
+            <input type="file" id="resume_file" accept=".pdf,.docx,.txt" class="mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 dark:file:bg-gray-700 dark:file:text-gray-300">
+            <button type="button" id="toggle_to_resume_text" class="mt-2 text-sm text-brand-600 hover:underline">I don't have a file, paste resume instead</button>
+        </div>
+        <div id="resume_text_section" class="hidden">
             <label class="block text-sm font-medium">Resume text</label>
-            <textarea id="resume_text" rows="8" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 p-3 text-sm">{{ resume_text or '' }}</textarea>
+            <textarea id="resume_text" rows="5" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 p-3 text-sm">{{ resume_text or '' }}</textarea>
+            <button type="button" id="toggle_to_resume_file" class="mt-2 text-sm text-brand-600 hover:underline">I have a file instead</button>
         </div>
         <button id="generateBtn" class="py-3 px-6 bg-brand-600 text-white rounded-md font-medium hover:bg-brand-700">Generate Summary</button>
     </div>
@@ -30,13 +36,18 @@ let summaryContent = '';
 document.getElementById('generateBtn').addEventListener('click', async () => {
     const btn = document.getElementById('generateBtn');
     btn.disabled = true;
+    const formData = new FormData();
+    const fileInput = document.getElementById('resume_file');
+    if (!document.getElementById('resume_file_section').classList.contains('hidden') && fileInput.files.length > 0) {
+        formData.append('file', fileInput.files[0]);
+    }
+    formData.append('resume_text', document.getElementById('resume_text').value);
+    formData.append('target_role', document.getElementById('target_role').value);
+
     const res = await fetch('/linkedin', {
         method: 'POST',
-        headers: csrfHeaders({ 'Content-Type': 'application/json' }),
-        body: JSON.stringify({
-            resume_text: document.getElementById('resume_text').value,
-            target_role: document.getElementById('target_role').value
-        })
+        headers: csrfHeaders({}),
+        body: formData
     });
     const data = await res.json();
     btn.disabled = false;
@@ -47,5 +58,16 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
     showToast('Summary generated', 'success');
 });
 document.getElementById('copyBtn').addEventListener('click', () => copyToClipboard(summaryContent));
+
+document.getElementById('toggle_to_resume_text').addEventListener('click', () => {
+    document.getElementById('resume_file_section').classList.add('hidden');
+    document.getElementById('resume_text_section').classList.remove('hidden');
+    document.getElementById('resume_file').value = '';
+});
+
+document.getElementById('toggle_to_resume_file').addEventListener('click', () => {
+    document.getElementById('resume_text_section').classList.add('hidden');
+    document.getElementById('resume_file_section').classList.remove('hidden');
+});
 </script>
 {% endblock %}

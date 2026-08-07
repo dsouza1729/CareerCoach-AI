@@ -5,13 +5,25 @@
     <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Cover Letter Generator</h1>
     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Generate a tailored cover letter from your resume and job posting.</p>
     <div class="mt-8 space-y-4">
-        <div>
+        <div id="resume_file_section">
+            <label class="block text-sm font-medium">Resume Upload (PDF/DOCX/TXT)</label>
+            <input type="file" id="resume_file" accept=".pdf,.docx,.txt" class="mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 dark:file:bg-gray-700 dark:file:text-gray-300">
+            <button type="button" id="toggle_to_resume_text" class="mt-2 text-sm text-brand-600 hover:underline">I don't have a file, paste resume instead</button>
+        </div>
+        <div id="resume_text_section" class="hidden">
             <label class="block text-sm font-medium">Resume text</label>
             <textarea id="resume_text" rows="5" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 p-3 text-sm">{{ resume_text or '' }}</textarea>
+            <button type="button" id="toggle_to_resume_file" class="mt-2 text-sm text-brand-600 hover:underline">I have a file instead</button>
         </div>
-        <div>
+        <div id="jd_link_section">
+            <label class="block text-sm font-medium">Job Link</label>
+            <input type="url" id="job_link" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 p-3 text-sm" placeholder="https://example.com/job">
+            <button type="button" id="toggle_to_text" class="mt-2 text-sm text-brand-600 hover:underline">I don't have a link, paste description instead</button>
+        </div>
+        <div id="jd_text_section" class="hidden">
             <label class="block text-sm font-medium">Job description</label>
-            <textarea id="job_description" rows="6" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 p-3 text-sm"></textarea>
+            <textarea id="job_description" rows="6" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 p-3 text-sm" placeholder="Paste the full job posting..."></textarea>
+            <button type="button" id="toggle_to_link" class="mt-2 text-sm text-brand-600 hover:underline">I have a link instead</button>
         </div>
         <div>
             <label class="block text-sm font-medium">Tone</label>
@@ -38,14 +50,22 @@ let letterContent = '';
 document.getElementById('generateBtn').addEventListener('click', async () => {
     const btn = document.getElementById('generateBtn');
     btn.disabled = true;
+    const formData = new FormData();
+    const fileInput = document.getElementById('resume_file');
+    if (fileInput.files.length > 0) {
+        formData.append('file', fileInput.files[0]);
+    }
+    formData.append('resume_text', document.getElementById('resume_text').value);
+    
+    let jobDescValue = document.getElementById('job_link').value.trim() || document.getElementById('job_description').value.trim();
+    formData.append('job_description', jobDescValue);
+    
+    formData.append('tone', document.getElementById('tone').value);
+
     const res = await fetch('/cover-letter', {
         method: 'POST',
-        headers: csrfHeaders({ 'Content-Type': 'application/json' }),
-        body: JSON.stringify({
-            resume_text: document.getElementById('resume_text').value,
-            job_description: document.getElementById('job_description').value,
-            tone: document.getElementById('tone').value
-        })
+        headers: csrfHeaders({}),
+        body: formData
     });
     const data = await res.json();
     btn.disabled = false;
@@ -56,5 +76,28 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
     showToast('Cover letter generated', 'success');
 });
 document.getElementById('copyBtn').addEventListener('click', () => copyToClipboard(letterContent));
+
+document.getElementById('toggle_to_text').addEventListener('click', () => {
+    document.getElementById('jd_link_section').classList.add('hidden');
+    document.getElementById('jd_text_section').classList.remove('hidden');
+    document.getElementById('job_link').value = '';
+});
+
+document.getElementById('toggle_to_link').addEventListener('click', () => {
+    document.getElementById('jd_text_section').classList.add('hidden');
+    document.getElementById('jd_link_section').classList.remove('hidden');
+    document.getElementById('job_description').value = '';
+});
+
+document.getElementById('toggle_to_resume_text').addEventListener('click', () => {
+    document.getElementById('resume_file_section').classList.add('hidden');
+    document.getElementById('resume_text_section').classList.remove('hidden');
+    document.getElementById('resume_file').value = '';
+});
+
+document.getElementById('toggle_to_resume_file').addEventListener('click', () => {
+    document.getElementById('resume_text_section').classList.add('hidden');
+    document.getElementById('resume_file_section').classList.remove('hidden');
+});
 </script>
 {% endblock %}

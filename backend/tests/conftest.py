@@ -1,4 +1,3 @@
-import os
 
 import pytest
 
@@ -11,8 +10,8 @@ def app(tmp_path, monkeypatch):
     monkeypatch.setenv("FLASK_DEBUG", "true")
     monkeypatch.setenv("INIT_DB_ON_STARTUP", "false")
 
-    import database
     import app as app_module
+    import database
 
     database.DB_PATH = db_path
     database.init_db()

@@ -188,6 +188,10 @@ def init_db():
             conn.execute("ALTER TABLE resumes ADD COLUMN target_job TEXT")
         except Exception:
             pass
+        try:
+            conn.execute("ALTER TABLE profiles ADD COLUMN profile_picture TEXT")
+        except Exception:
+            pass
         for statement in INDEX_STATEMENTS:
             conn.execute(statement)
         conn.commit()
