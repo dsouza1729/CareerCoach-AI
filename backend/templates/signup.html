@@ -102,12 +102,17 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
             const data = await response.json();
             window.location.href = data.redirect || '/onboarding';
         } else {
-            const data = await response.json();
-            errorMessage.textContent = data.detail || 'Signup failed';
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+                const data = await response.json();
+                errorMessage.textContent = data.detail || 'Signup failed';
+            } else {
+                errorMessage.textContent = 'A server error occurred. Please try again later.';
+            }
             errorMessage.classList.remove('hidden');
         }
     } catch (error) {
-        errorMessage.textContent = 'An error occurred';
+        errorMessage.textContent = error.message || 'An error occurred';
         errorMessage.classList.remove('hidden');
     }
 });

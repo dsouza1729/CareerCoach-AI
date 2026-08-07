@@ -9,8 +9,6 @@ from database import init_db
 from routes import register_routes
 from security import csrf
 
-from werkzeug.middleware.proxy_fix import ProxyFix
-
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 app.secret_key = load_secret_key()
@@ -37,5 +35,4 @@ def inject_user():
 
 
 if __name__ == "__main__":
-    init_db()
     app.run(debug=is_debug_mode(), port=int(os.getenv("PORT", "8000")))

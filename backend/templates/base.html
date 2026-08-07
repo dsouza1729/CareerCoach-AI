@@ -44,9 +44,9 @@
 
     {% set path = request.path %}
 
-    <header id="site-header" class="site-header sticky top-0 z-50 pt-4 px-4 sm:px-6 lg:px-8 mb-4 transition-all duration-300">
-        <div id="header-card" class="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 shadow-sm rounded-2xl max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300">
-            <div id="header-inner" class="flex items-center justify-between h-16 transition-all duration-300">
+    <header id="site-header" class="site-header sticky top-0 z-50 pt-4 px-4 sm:px-6 lg:px-8 transition-all duration-700 ease-in-out">
+        <div id="header-card" class="bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl border border-white/40 dark:border-gray-700/40 shadow-sm rounded-2xl max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-700 ease-in-out">
+            <div id="header-inner" class="flex items-center justify-between h-16 transition-all duration-700 ease-in-out">
                 <a href="{% if session.get('user_id') %}/dashboard{% else %}/{% endif %}" class="flex items-center gap-3 shrink-0 group">
                     <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white text-xs font-bold shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-300">AI</span>
                     <span class="text-lg font-bold tracking-tight text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors duration-300">CareerCoach</span>
@@ -92,8 +92,6 @@
                         </a>
                     </div>
                     {% else %}
-                    <nav class="flex items-center gap-1 mr-4 bg-gray-100/50 dark:bg-gray-800/50 p-1 rounded-xl" aria-label="Main">
-                    </nav>
                     <div class="flex items-center gap-2 pl-4 border-l border-gray-200 dark:border-gray-700">
                         <button class="dark-mode-toggle p-2 rounded-xl text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none" aria-label="Toggle Dark Mode">
                             <svg class="w-5 h-5 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
@@ -119,7 +117,7 @@
         </div>
 
         <!-- Mobile menu -->
-        <div id="mobile-menu" class="hidden md:hidden absolute left-4 right-4 top-20 bg-white/90 dark:bg-gray-900/95 backdrop-blur-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-2xl rounded-2xl p-5 z-50 animate-slide-down">
+        <div id="mobile-menu" class="hidden md:hidden absolute left-4 right-4 top-20 bg-white/70 dark:bg-gray-900/80 backdrop-blur-3xl border border-gray-200/50 dark:border-gray-700/50 shadow-2xl rounded-2xl p-5 z-50 animate-slide-down">
             {% if session.get('user_id') %}
             <div class="space-y-1 mb-6">
                 <p class="text-xs font-bold uppercase tracking-widest text-brand-500 dark:text-brand-400 mb-3 ml-2">Workspace</p>

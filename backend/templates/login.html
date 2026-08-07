@@ -109,12 +109,17 @@
         const data = await response.json();
         window.location.href = data.redirect || '/dashboard';
       } else {
-        const data = await response.json();
-        errorMessage.textContent = data.detail || 'Login failed. Please check your credentials.';
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+            const data = await response.json();
+            errorMessage.textContent = data.detail || 'Login failed. Please check your credentials.';
+        } else {
+            errorMessage.textContent = 'A server error occurred. Please try again later.';
+        }
         errorMessage.classList.remove('hidden');
       }
     } catch (error) {
-      errorMessage.textContent = 'An error occurred. Please try again.';
+      errorMessage.textContent = error.message || 'An error occurred. Please try again.';
       errorMessage.classList.remove('hidden');
     }
   });

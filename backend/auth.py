@@ -1,6 +1,6 @@
 import hashlib
 
-from flask import redirect, session, url_for
+from flask import redirect, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from config import EMAIL_RE, MIN_PASSWORD_LENGTH
@@ -57,6 +57,12 @@ def login_user(user):
 def require_login():
     if "user_id" not in session:
         return redirect(url_for("auth.login"))
+        
+    if request.endpoint not in ["core.onboarding", "auth.logout", "static"]:
+        profile = get_profile(session["user_id"])
+        if not profile or not profile.get("onboarding_done"):
+            return redirect(url_for("core.onboarding"))
+            
     return None
 
 

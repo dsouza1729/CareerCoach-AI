@@ -1,60 +1,264 @@
 {% extends "base.html" %}
 {% block title %}Welcome - CareerCoach{% endblock %}
 {% block content %}
-<div class="max-w-xl mx-auto py-12 px-4">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Let's personalize your coach</h1>
-        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">This helps the AI tailor advice to your goals.</p>
-        <form id="onboardingForm" class="mt-8 space-y-5">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Full name</label>
-                <input type="text" id="full_name" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2" placeholder="Jane Doe">
+<div class="min-h-[calc(100vh-4rem)] py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden transition-colors flex items-center justify-center">
+    <!-- Decorative background elements -->
+    <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-brand-500/20 rounded-full blur-3xl animate-pulse"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+    
+    <div class="max-w-2xl w-full relative z-10 animate-slide-down">
+        <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-3xl rounded-3xl shadow-2xl border border-white/40 dark:border-gray-700/50 overflow-hidden">
+            <!-- Header section with gradient -->
+            <div class="bg-gradient-to-br from-brand-600 to-indigo-800 p-8 sm:p-10 relative overflow-hidden text-center sm:text-left group">
+                <div class="absolute top-[-50%] right-[-10%] w-64 h-64 bg-white/10 rounded-full blur-3xl transition-transform duration-700 group-hover:scale-110"></div>
+                <div class="relative z-10">
+                    <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight drop-shadow-md">Let's personalize your coach</h1>
+                    <p class="mt-2 text-brand-100 font-medium">This helps the AI tailor advice to your unique goals and background.</p>
+                </div>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Target role</label>
-                <input type="text" id="target_role" required class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2" placeholder="Senior Software Engineer">
+
+            <div class="p-8 sm:p-10">
+                <form id="onboardingForm" class="space-y-8">
+                    
+                    <div class="space-y-6">
+                        <!-- Full Name -->
+                        <div class="group relative">
+                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 transition-colors group-focus-within:text-brand-600 dark:group-focus-within:text-brand-400">Full name <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-gray-400 group-focus-within:text-brand-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                </div>
+                                <input type="text" id="full_name" required class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 dark:bg-gray-900/50 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all shadow-sm hover:border-gray-300 dark:hover:border-gray-500 outline-none text-gray-900 dark:text-white capitalize" placeholder="Jane Doe">
+                            </div>
+                        </div>
+
+                        <!-- Target Role -->
+                        <div class="group relative">
+                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 transition-colors group-focus-within:text-brand-600 dark:group-focus-within:text-brand-400">Target role / Occupation <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-gray-400 group-focus-within:text-brand-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                </div>
+                                <input type="text" id="target_role" required class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 dark:bg-gray-900/50 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all shadow-sm hover:border-gray-300 dark:hover:border-gray-500 outline-none text-gray-900 dark:text-white capitalize" placeholder="Senior Software Engineer">
+                            </div>
+                        </div>
+
+                        <!-- Industry -->
+                        <div class="group relative z-30">
+                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 transition-colors group-focus-within:text-brand-600 dark:group-focus-within:text-brand-400">Industry</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-gray-400 group-focus-within:text-brand-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                                </div>
+                                <input type="text" id="industry" readonly placeholder="Select an industry"
+                                    class="w-full pl-11 pr-10 py-3 rounded-xl border border-gray-200 dark:border-gray-600 dark:bg-gray-900/50 cursor-pointer focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all shadow-sm hover:border-gray-300 dark:hover:border-gray-500 outline-none text-gray-900 dark:text-white"
+                                    onclick="toggleIndustryDropdown()">
+                                <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                                    <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                </div>
+                                <div id="industryDropdown" class="hidden absolute z-40 mt-2 w-full bg-white dark:bg-gray-800 shadow-xl rounded-xl border border-gray-100 dark:border-gray-700 flex flex-col transform transition-all origin-top scale-95 opacity-0">
+                                    <div class="p-3 border-b border-gray-100 dark:border-gray-700">
+                                        <div class="relative">
+                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                            </div>
+                                            <input type="text" id="industrySearch" placeholder="Search industries..." class="w-full pl-9 pr-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-900/50 text-sm outline-none focus:ring-2 focus:ring-brand-500 transition-all">
+                                        </div>
+                                    </div>
+                                    <ul id="industryList" class="max-h-56 overflow-y-auto py-2 px-1 custom-scrollbar"></ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <!-- Years of experience -->
+                            <div class="group relative z-20">
+                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 transition-colors group-focus-within:text-brand-600 dark:group-focus-within:text-brand-400">Years of experience</label>
+                                <div class="flex gap-2">
+                                    <div class="flex-1 relative">
+                                        <select id="exp_years" class="w-full rounded-xl border border-gray-200 dark:border-gray-600 dark:bg-gray-900/50 pl-4 pr-10 py-3 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all shadow-sm appearance-none cursor-pointer outline-none hover:border-gray-300 dark:hover:border-gray-500 text-gray-900 dark:text-white">
+                                            {% for i in range(51) %}
+                                            <option value="{{ i }}" {% if i == 2 %}selected{% endif %}>{{ i }} Year{% if i != 1 %}s{% endif %}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                                            <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 relative">
+                                        <select id="exp_months" class="w-full rounded-xl border border-gray-200 dark:border-gray-600 dark:bg-gray-900/50 pl-4 pr-10 py-3 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all shadow-sm appearance-none cursor-pointer outline-none hover:border-gray-300 dark:hover:border-gray-500 text-gray-900 dark:text-white">
+                                            {% for i in range(12) %}
+                                            <option value="{{ i }}">{{ i }} Month{% if i != 1 %}s{% endif %}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                                            <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Coaching tone -->
+                            <div class="group relative">
+                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 transition-colors group-focus-within:text-brand-600 dark:group-focus-within:text-brand-400">Preferred coaching tone</label>
+                                <div class="relative">
+                                    <select id="tone" class="appearance-none w-full pl-4 pr-10 py-3 rounded-xl border border-gray-200 dark:border-gray-600 dark:bg-gray-900/50 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all shadow-sm hover:border-gray-300 dark:hover:border-gray-500 outline-none text-gray-900 dark:text-white cursor-pointer">
+                                        <option value="supportive">Supportive (Encouraging)</option>
+                                        <option value="balanced" selected>Balanced (Standard)</option>
+                                        <option value="direct">Direct (No nonsense)</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pt-4">
+                        <button type="submit" class="w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-md text-base font-bold text-white bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transform transition-all active:scale-[0.98]">
+                            Complete Setup
+                        </button>
+                    </div>
+                </form>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Industry</label>
-                <input type="text" id="industry" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2" placeholder="Technology">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Years of experience</label>
-                <select id="years_experience" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2">
-                    <option value="0-1">0–1 years</option>
-                    <option value="2-4" selected>2–4 years</option>
-                    <option value="5-9">5–9 years</option>
-                    <option value="10+">10+ years</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Coaching tone</label>
-                <select id="tone" class="mt-1 w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2">
-                    <option value="supportive">Supportive</option>
-                    <option value="balanced" selected>Balanced</option>
-                    <option value="direct">Direct</option>
-                </select>
-            </div>
-            <button type="submit" class="w-full py-3 bg-brand-600 text-white rounded-md font-medium hover:bg-brand-700">Continue to Dashboard</button>
-        </form>
+        </div>
     </div>
 </div>
+
+<style>
+    /* Custom scrollbar for dropdown */
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(156, 163, 175, 0.5); border-radius: 20px; }
+    html.dark .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(75, 85, 99, 0.5); }
+</style>
 {% endblock %}
+
 {% block scripts %}
 <script>
+// Industry Dropdown Logic
+const industries = [
+    "Technology / Software", "Finance / Banking", "Healthcare / Medical", "Education / E-Learning", 
+    "Manufacturing / Engineering", "Retail / E-Commerce", "Media / Entertainment", "Marketing / Advertising", 
+    "Consulting / Professional Services", "Real Estate / Construction", "Transportation / Logistics", 
+    "Energy / Environmental", "Government / Public Sector", "Non-Profit / NGO", "Hospitality / Tourism", 
+    "Telecommunications", "Legal Services", "Agriculture / Food Production", "Automotive", "Aerospace / Defense",
+    "Architecture / Interior Design", "Accounting / Auditing", "Consumer Electronics", "Consumer Goods / FMCG",
+    "Biotechnology / Life Sciences", "Pharmaceuticals", "Insurance", "Venture Capital / Private Equity",
+    "Fashion / Apparel", "Fitness / Wellness", "Food & Beverage", "Human Resources / Recruiting",
+    "Cyber Security", "Artificial Intelligence / Machine Learning", "Game Development", "Blockchain / Web3",
+    "Data Science / Analytics", "Mining / Metals", "Oil & Gas", "CleanTech / Renewable Energy",
+    "Social Media / Networking", "Event Management", "Sports / Recreation", "Graphic Design / UI/UX",
+    "Supply Chain / Procurement", "Publishing / Journalism", "Utilities / Infrastructure", "E-Sports / Gaming",
+    "Customer Service / Support", "Maritime / Shipping"
+];
+
+const industryDropdown = document.getElementById('industryDropdown');
+const industryInput = document.getElementById('industry');
+const industrySearch = document.getElementById('industrySearch');
+const industryList = document.getElementById('industryList');
+
+function toggleIndustryDropdown() {
+    if (industryDropdown.classList.contains('hidden')) {
+        industryDropdown.classList.remove('hidden');
+        setTimeout(() => {
+            industryDropdown.classList.remove('opacity-0', 'scale-95');
+            industryDropdown.classList.add('opacity-100', 'scale-100');
+        }, 10);
+        industrySearch.focus();
+    } else {
+        closeIndustryDropdown();
+    }
+}
+
+function closeIndustryDropdown() {
+    industryDropdown.classList.remove('opacity-100', 'scale-100');
+    industryDropdown.classList.add('opacity-0', 'scale-95');
+    setTimeout(() => {
+        industryDropdown.classList.add('hidden');
+    }, 200);
+}
+
+function renderIndustries(filter = "") {
+    industryList.innerHTML = '';
+    const filtered = industries.filter(ind => ind.toLowerCase().includes(filter.toLowerCase()));
+    
+    if (filtered.length === 0) {
+        industryList.innerHTML = '<li class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 text-center">No industries found</li>';
+        return;
+    }
+    
+    filtered.forEach(ind => {
+        const li = document.createElement('li');
+        li.className = 'px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-brand-50 dark:hover:bg-brand-900/30 hover:text-brand-600 dark:hover:text-brand-400 cursor-pointer rounded-lg transition-colors mx-1 my-0.5 flex items-center justify-between group/item';
+        
+        const isSelected = industryInput.value === ind;
+        if (isSelected) li.classList.add('bg-brand-50', 'dark:bg-brand-900/30', 'text-brand-600', 'dark:text-brand-400', 'font-medium');
+        
+        li.innerHTML = `
+            <span>${ind}</span>
+            <svg class="w-4 h-4 text-brand-600 dark:text-brand-400 ${isSelected ? 'opacity-100' : 'opacity-0 group-hover/item:opacity-50'} transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        `;
+        
+        li.onclick = () => {
+            industryInput.value = ind;
+            closeIndustryDropdown();
+            renderIndustries();
+        };
+        industryList.appendChild(li);
+    });
+}
+
+industrySearch.addEventListener('input', (e) => renderIndustries(e.target.value));
+
+document.addEventListener('click', (e) => {
+    if (!industryInput.contains(e.target) && !industryDropdown.contains(e.target)) {
+        closeIndustryDropdown();
+    }
+});
+
+renderIndustries();
+
 document.getElementById('onboardingForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const payload = {
-        full_name: document.getElementById('full_name').value,
-        target_role: document.getElementById('target_role').value,
-        industry: document.getElementById('industry').value,
-        years_experience: document.getElementById('years_experience').value,
-        tone: document.getElementById('tone').value
-    };
-    const res = await fetch('/onboarding', { method: 'POST', headers: csrfHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify(payload) });
-    const data = await res.json();
-    if (res.ok) window.location.href = data.redirect || '/dashboard';
-    else showToast(data.detail || 'Failed to save profile', 'error');
+    
+    // Add loading state
+    const btn = e.target.querySelector('button');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white inline-block" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving profile...`;
+    btn.disabled = true;
+
+    try {
+        const exp_years = document.getElementById('exp_years').value;
+        const exp_months = document.getElementById('exp_months').value;
+        const years_experience = `${exp_years}.${exp_months}`;
+
+        const payload = {
+            full_name: document.getElementById('full_name').value,
+            target_role: document.getElementById('target_role').value,
+            industry: document.getElementById('industry').value,
+            years_experience: years_experience,
+            tone: document.getElementById('tone').value
+        };
+        const res = await fetch('/onboarding', { 
+            method: 'POST', 
+            headers: csrfHeaders({ 'Content-Type': 'application/json' }), 
+            body: JSON.stringify(payload) 
+        });
+        const data = await res.json();
+        
+        if (res.ok) {
+            window.location.href = data.redirect || '/dashboard';
+        } else {
+            showToast(data.detail || 'Failed to save profile', 'error');
+        }
+    } catch (err) {
+        showToast('An error occurred. Please try again.', 'error');
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
 });
 </script>
 {% endblock %}

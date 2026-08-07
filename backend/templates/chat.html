@@ -20,7 +20,7 @@
 <div class="max-w-4xl mx-auto mt-2 sm:mt-4 mb-2 sm:mb-8 px-2 sm:px-6 lg:px-8 flex flex-col h-[calc(100dvh-6rem)] sm:h-[calc(100dvh-9rem)]">
     
     <!-- Glassmorphic Header -->
-    <div class="relative z-20 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl px-4 py-3 sm:px-6 sm:py-4 border border-gray-200/60 dark:border-gray-700/60 rounded-t-xl sm:rounded-t-2xl shadow-sm flex items-center justify-between">
+    <div class="relative z-20 bg-white/60 dark:bg-gray-800/60 backdrop-blur-2xl px-4 py-3 sm:px-6 sm:py-4 border border-white/40 dark:border-gray-700/60 rounded-t-xl sm:rounded-t-2xl shadow-sm flex items-center justify-between">
         <div class="flex items-center gap-4">
             <div class="w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center shadow-md">
                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
@@ -57,7 +57,7 @@
             <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-brand-100 to-indigo-100 dark:from-brand-900 dark:to-indigo-900 flex items-center justify-center shadow-sm border border-brand-200 dark:border-brand-800">
                 <svg class="h-5 w-5 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
             </div>
-            <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-2xl rounded-tl-sm px-4 py-3 sm:px-5 sm:py-4 shadow-sm max-w-[90%] sm:max-w-[85%] text-gray-800 dark:text-gray-200 text-sm leading-relaxed">
+            <div class="bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl border border-white/40 dark:border-gray-700/50 rounded-2xl rounded-tl-sm px-4 py-3 sm:px-5 sm:py-4 shadow-sm max-w-[90%] sm:max-w-[85%] text-gray-800 dark:text-gray-200 text-sm leading-relaxed">
                 Hello! I am your AI Career Coach. How can I help you accelerate your career today?
             </div>
         </div>
@@ -69,7 +69,7 @@
                 <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-brand-100 to-indigo-100 dark:from-brand-900 dark:to-indigo-900 flex items-center justify-center shadow-sm border border-brand-200 dark:border-brand-800">
                     <svg class="h-5 w-5 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                 </div>
-                <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-2xl rounded-tl-sm px-4 py-3 sm:px-5 sm:py-4 shadow-sm max-w-[90%] sm:max-w-[85%] text-gray-800 dark:text-gray-200 text-sm leading-relaxed prose-brand ai-message-content whitespace-pre-wrap">{{ msg.content }}</div>
+                <div class="bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl border border-white/40 dark:border-gray-700/50 rounded-2xl rounded-tl-sm px-4 py-3 sm:px-5 sm:py-4 shadow-sm max-w-[90%] sm:max-w-[85%] text-gray-800 dark:text-gray-200 text-sm leading-relaxed prose-brand ai-message-content whitespace-pre-wrap">{{ msg.content }}</div>
             </div>
             {% else %}
             <div class="flex items-start justify-end gap-4 relative z-10 animate-fade-in-up">
@@ -87,10 +87,10 @@
     </div>
     
     <!-- Floating Input Pill Area -->
-    <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl px-2 py-2 sm:px-4 sm:py-4 border border-gray-200/60 dark:border-gray-700/60 rounded-b-xl sm:rounded-b-2xl shadow-sm relative z-20">
+    <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-2xl px-2 py-2 sm:px-4 sm:py-4 border border-white/40 dark:border-gray-700/60 rounded-b-xl sm:rounded-b-2xl shadow-sm relative z-20">
         <form id="chatForm" class="relative flex items-center">
             <input type="text" id="messageInput" autocomplete="off" required 
-                   class="w-full pl-4 pr-12 py-3 sm:pl-6 sm:pr-14 sm:py-4 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all shadow-inner outline-none text-sm sm:text-base text-gray-900 dark:text-white" 
+                   class="w-full pl-4 pr-12 py-3 sm:pl-6 sm:pr-14 sm:py-4 rounded-full border border-white/50 dark:border-gray-600 bg-white/40 dark:bg-gray-900/40 backdrop-blur-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all shadow-inner outline-none text-sm sm:text-base text-gray-900 dark:text-white" 
                    placeholder="Ask anything about your career...">
             
             <button type="submit" id="sendBtn" class="absolute right-2 p-3 bg-gray-900 dark:bg-brand-600 hover:bg-black dark:hover:bg-brand-500 text-white rounded-full transition-colors duration-300 shadow-sm active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed group overflow-hidden">
@@ -138,7 +138,7 @@ function appendAiMessage(text) {
         <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-brand-100 to-indigo-100 dark:from-brand-900 dark:to-indigo-900 flex items-center justify-center shadow-sm border border-brand-200 dark:border-brand-800">
             <svg class="h-5 w-5 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
         </div>
-        <div class="ai-message-content bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-2xl rounded-tl-sm px-4 py-3 sm:px-5 sm:py-4 shadow-sm max-w-[90%] sm:max-w-[85%] text-gray-800 dark:text-gray-200 text-sm leading-relaxed prose-brand">
+        <div class="ai-message-content bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl border border-white/40 dark:border-gray-700/50 rounded-2xl rounded-tl-sm px-4 py-3 sm:px-5 sm:py-4 shadow-sm max-w-[90%] sm:max-w-[85%] text-gray-800 dark:text-gray-200 text-sm leading-relaxed prose-brand">
         </div>`;
     
     // Parse markdown securely
@@ -198,7 +198,7 @@ document.getElementById('chatForm').addEventListener('submit', async (e) => {
         <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-brand-100 to-indigo-100 dark:from-brand-900 dark:to-indigo-900 flex items-center justify-center shadow-sm border border-brand-200 dark:border-brand-800">
             <svg class="h-5 w-5 text-brand-600 dark:text-brand-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
         </div>
-        <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-2xl rounded-tl-sm px-6 py-5 shadow-sm flex items-center space-x-2">
+        <div class="bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl border border-white/40 dark:border-gray-700/50 rounded-2xl rounded-tl-sm px-6 py-5 shadow-sm flex items-center space-x-2">
             <div class="w-2 h-2 bg-brand-400 rounded-full animate-bounce" style="animation-delay: 0s"></div>
             <div class="w-2 h-2 bg-brand-400 rounded-full animate-bounce" style="animation-delay: 0.15s"></div>
             <div class="w-2 h-2 bg-brand-400 rounded-full animate-bounce" style="animation-delay: 0.3s"></div>

@@ -24,8 +24,8 @@ Edit `.env`:
 
 - Set `SECRET_KEY` to a long random string
 - Add `AWS_BEARER_TOKEN_BEDROCK` for AI features
-- Configure `SMTP_*` variables for password reset emails
-- In local dev without SMTP, set `FLASK_DEBUG=true` to receive a debug reset link in the API response
+- Configure `RESEND_API_KEY` and `RESEND_FROM_EMAIL` variables for password reset emails
+- In local dev without the Resend configuration, set `FLASK_DEBUG=true` to log the reset link to the backend console instead of emailing it
 
 ## Run
 
@@ -52,7 +52,7 @@ powershell -File scripts/download_vendor_assets.ps1
 ## Production notes
 
 - Set `FLASK_DEBUG=false` and a strong `SECRET_KEY`
-- Configure SMTP so password reset works without debug URLs
+- Configure Resend API keys so password reset works
 - AI rate limits are enforced via the `ai_usage` table using `AI_RATE_LIMIT` and `AI_RATE_WINDOW_SECONDS` (default: 20 requests per hour)
 - Session cookies use `HttpOnly`, `SameSite=Lax`, and `Secure` (when not in debug mode); lifetime defaults to 14 days via `SESSION_LIFETIME_DAYS`
 - Do not commit `.env`, `venv/`, or `*.db` files

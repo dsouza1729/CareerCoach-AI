@@ -82,11 +82,11 @@ def forgot_password():
         email = normalize_email(request.json.get("email") if request.is_json else request.form.get("email"))
         if not is_valid_email(email):
             return jsonify({"detail": "Invalid email"}), 400
-        payload = {"status": "success", "message": "If that email exists, a reset link was created."}
+        payload = {"status": "success", "message": "A reset link was created. Check your email or use the link below."}
         with get_db() as conn:
             user = conn.execute("SELECT id FROM users WHERE email = ?", (email,)).fetchone()
             if not user:
-                return jsonify(payload)
+                return jsonify({"status": "error", "message": "This email is not registered. Please sign up."}), 404
             token = secrets.token_urlsafe(32)
             expires = datetime.now(UTC).replace(tzinfo=None) + timedelta(hours=1)
             conn.execute("DELETE FROM password_resets WHERE email = ?", (email,))
@@ -97,6 +97,7 @@ def forgot_password():
             conn.commit()
         reset_url = url_for("auth.reset_password", token=token, _external=True)
         if not email_service.send_password_reset_email(email, reset_url) and is_debug_mode():
+            print(f"DEBUG: Password reset link for {email}: {reset_url}")
             payload["debug_reset_url"] = reset_url
         return jsonify(payload)
     return render_template("forgot_password.html")

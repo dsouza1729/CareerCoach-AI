@@ -1,39 +1,40 @@
 import os
-import smtplib
-from email.message import EmailMessage
+import requests
 
 
 def is_email_configured():
-    return bool(os.getenv("SMTP_HOST") and os.getenv("SMTP_FROM"))
+    return bool(os.getenv("RESEND_API_KEY") and os.getenv("RESEND_FROM_EMAIL"))
 
 
 def send_password_reset_email(to_email, reset_url):
-    """Send a password reset link. Returns True if sent, False if SMTP is not configured."""
-    host = os.getenv("SMTP_HOST")
-    from_addr = os.getenv("SMTP_FROM")
-    if not host or not from_addr:
+    """Send a password reset link using Resend API. Returns True if sent, False if not configured or failed."""
+    api_key = os.getenv("RESEND_API_KEY")
+    from_addr = os.getenv("RESEND_FROM_EMAIL")
+    
+    if not api_key or not from_addr:
         return False
 
-    port = int(os.getenv("SMTP_PORT", "587"))
-    username = os.getenv("SMTP_USER") or None
-    password = os.getenv("SMTP_PASSWORD") or None
-    use_tls = os.getenv("SMTP_USE_TLS", "true").lower() in ("true", "1", "yes")
+    url = "https://api.resend.com/emails"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+    
+    payload = {
+        "from": from_addr,
+        "to": [to_email],
+        "subject": "Reset your CareerCoach password",
+        "text": (
+            "You requested a password reset for your CareerCoach account.\n\n"
+            f"Reset your password here (link expires in 1 hour):\n{reset_url}\n\n"
+            "If you did not request this, you can ignore this email."
+        )
+    }
 
-    message = EmailMessage()
-    message["Subject"] = "Reset your CareerCoach password"
-    message["From"] = from_addr
-    message["To"] = to_email
-    message.set_content(
-        "You requested a password reset for your CareerCoach account.\n\n"
-        f"Reset your password here (link expires in 1 hour):\n{reset_url}\n\n"
-        "If you did not request this, you can ignore this email."
-    )
-
-    with smtplib.SMTP(host, port, timeout=30) as smtp:
-        if use_tls:
-            smtp.starttls()
-        if username and password:
-            smtp.login(username, password)
-        smtp.send_message(message)
-
-    return True
+    try:
+        response = requests.post(url, headers=headers, json=payload, timeout=10)
+        response.raise_for_status()
+        return True
+    except requests.RequestException as e:
+        print(f"ERROR: Failed to send email via Resend: {e}")
+        return False

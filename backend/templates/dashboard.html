@@ -14,16 +14,16 @@
         <a href="/profile" class="text-sm text-brand-600 hover:underline">Edit profile →</a>
     </div>
     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg border border-gray-100 dark:border-gray-700">
+        <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl overflow-hidden shadow-md rounded-2xl border border-white/50 dark:border-gray-700">
             <div class="px-4 py-5 sm:p-6"><dt class="text-sm font-medium text-gray-500 truncate">Resumes Analyzed</dt><dd class="mt-1 text-3xl font-semibold text-brand-600">{{ stats.resumes_analyzed }}</dd></div>
         </div>
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg border border-gray-100 dark:border-gray-700">
+        <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl overflow-hidden shadow-md rounded-2xl border border-white/50 dark:border-gray-700">
             <div class="px-4 py-5 sm:p-6"><dt class="text-sm font-medium text-gray-500 truncate">Chat Messages</dt><dd class="mt-1 text-3xl font-semibold text-brand-600">{{ stats.chat_messages }}</dd></div>
         </div>
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg border border-gray-100 dark:border-gray-700">
+        <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl overflow-hidden shadow-md rounded-2xl border border-white/50 dark:border-gray-700">
             <div class="px-4 py-5 sm:p-6"><dt class="text-sm font-medium text-gray-500 truncate">Interviews Practiced</dt><dd class="mt-1 text-3xl font-semibold text-brand-600">{{ stats.interviews_done }}</dd></div>
         </div>
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg border border-gray-100 dark:border-gray-700">
+        <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl overflow-hidden shadow-md rounded-2xl border border-white/50 dark:border-gray-700">
             <div class="px-4 py-5 sm:p-6"><dt class="text-sm font-medium text-gray-500 truncate">AI Usage ({{ stats.ai_window_label or 'this hour' }})</dt><dd class="mt-1 text-3xl font-semibold text-brand-600">{{ stats.ai_used_this_hour }}/{{ stats.ai_limit }}</dd></div>
         </div>
     </div>
@@ -41,7 +41,7 @@
             ('/salary', 'Salary Advisor', 'Ranges & negotiation tips', 'emerald')
         ] %}
         {% for href, title, desc, _ in cards %}
-        <a href="{{ href }}" class="group block relative bg-white dark:bg-gray-800/90 rounded-2xl border border-gray-100 dark:border-gray-700/60 p-6 shadow-sm hover:shadow-2xl hover:shadow-brand-500/10 hover:border-brand-200 dark:hover:border-brand-500/30 transform transition-all duration-300 hover:-translate-y-1.5 overflow-hidden">
+        <a href="{{ href }}" class="group block relative bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl rounded-2xl border border-white/50 dark:border-gray-700/60 p-6 shadow-sm hover:shadow-2xl hover:shadow-brand-500/10 hover:border-brand-200 dark:hover:border-brand-500/30 transform transition-all duration-300 hover:-translate-y-1.5 overflow-hidden">
             <div class="absolute inset-0 bg-gradient-to-br from-brand-50/50 to-transparent dark:from-brand-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
             
             <div class="relative z-10">

@@ -21,6 +21,12 @@ def onboarding():
     user_id = session["user_id"]
     if request.method == "POST":
         data = request.get_json(silent=True) or {}
+        full_name = (data.get("full_name") or "").strip()
+        target_role = (data.get("target_role") or "").strip()
+        
+        if not full_name or not target_role:
+            return jsonify({"detail": "Full name and Target role are required."}), 400
+
         update_fields = [
             "full_name=excluded.full_name",
             "target_role=excluded.target_role",
@@ -34,8 +40,8 @@ def onboarding():
         insert_vals = ["?", "?", "?", "?", "?", "?", "1"]
         params = [
             user_id,
-            (data.get("full_name") or "").strip(),
-            (data.get("target_role") or "").strip(),
+            full_name,
+            target_role,
             (data.get("industry") or "").strip(),
             (data.get("years_experience") or "").strip(),
             data.get("tone") or "balanced"
